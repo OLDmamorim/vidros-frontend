@@ -1,4 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Configuração da URL da API
+const API_URL = import.meta.env.VITE_API_URL || 
+                (import.meta.env.MODE === 'production' 
+                  ? 'https://vidros-backend-production.up.railway.app' 
+                  : 'http://localhost:3001');
+
+console.log('API_URL configurado:', API_URL);
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
