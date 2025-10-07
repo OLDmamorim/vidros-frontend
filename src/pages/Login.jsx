@@ -4,9 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Package } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -33,63 +32,72 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <Package className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          {/* Logo */}
+          <div className="mb-6">
+            <img 
+              src="/logo.png" 
+              alt="ExpressGlass" 
+              className="w-full h-auto max-w-sm mx-auto"
+            />
           </div>
-          <div>
-            <CardTitle className="text-2xl font-bold">Portal de Vidros Especiais</CardTitle>
-            <CardDescription className="text-base mt-2">
-              Faça login para aceder ao sistema
-            </CardDescription>
+
+          {/* Título */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Bem-vindo</h1>
+            <p className="text-gray-600 text-sm">Faça login na sua conta</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Formulário */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">
+                Username
+              </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="Insira o seu username"
                 required
                 disabled={loading}
-                className="h-11"
+                className="h-12 bg-gray-50 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 font-medium">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
                 required
                 disabled={loading}
-                className="h-11"
+                className="h-12 bg-gray-50 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
               />
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full h-11 text-base font-medium"
+            <Button
+              type="submit"
               disabled={loading}
+              className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-base rounded-lg shadow-lg transition-all duration-200"
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   A entrar...
                 </>
               ) : (
@@ -97,8 +105,8 @@ export default function Login() {
               )}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
