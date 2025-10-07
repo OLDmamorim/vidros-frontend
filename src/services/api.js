@@ -1,8 +1,11 @@
 // Configuração da URL da API
-const API_URL = import.meta.env.VITE_API_URL || 
-                (import.meta.env.MODE === 'production' 
-                  ? 'https://vidros-backend-production.up.railway.app' 
-                  : 'http://localhost:3001');
+let API_URL = import.meta.env.VITE_API_URL || 
+              (import.meta.env.MODE === 'production' 
+                ? 'https://vidros-backend-production.up.railway.app' 
+                : 'http://localhost:3001');
+
+// Remover barra final se existir
+API_URL = API_URL.replace(/\/$/, '');
 
 console.log('API_URL configurado:', API_URL);
 
