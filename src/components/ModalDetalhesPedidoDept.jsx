@@ -360,56 +360,6 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                   </div>
                 </div>
 
-                {/* Adicionar Atualização */}
-                <div className="bg-gray-700 rounded-lg p-5">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center border-b border-gray-600 pb-2">
-                    <Plus className="mr-2 h-5 w-5 text-purple-400" />
-                    Nova Atualização
-                  </h3>
-                  
-                  <div className="space-y-4">
-                    <Textarea
-                      value={novaMensagem}
-                      onChange={(e) => setNovaMensagem(e.target.value)}
-                      placeholder="Escreva uma atualização, resposta ou nota..."
-                      className="bg-gray-800 border-gray-600 text-white min-h-[100px]"
-                    />
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="visivel"
-                        checked={visivelLoja}
-                        onCheckedChange={setVisivelLoja}
-                        className="border-gray-600"
-                      />
-                      <label
-                        htmlFor="visivel"
-                        className="text-sm text-white cursor-pointer"
-                      >
-                        Visível para a loja
-                      </label>
-                    </div>
-
-                    <Button
-                      onClick={handleAddUpdate}
-                      disabled={saving || !novaMensagem.trim()}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          A adicionar...
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="mr-2 h-4 w-4" />
-                          Adicionar Atualização
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
                 {/* Histórico Completo */}
                 <div className="bg-gray-700 rounded-lg p-5">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center border-b border-gray-600 pb-2">
@@ -463,6 +413,56 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                       <p className="text-sm">Ainda não há atualizações</p>
                     </div>
                   )}
+                </div>
+
+                {/* Adicionar Atualização */}
+                <div className="bg-gray-700 rounded-lg p-5">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center border-b border-gray-600 pb-2">
+                    <Plus className="mr-2 h-5 w-5 text-purple-400" />
+                    Nova Atualização
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <Textarea
+                      value={novaMensagem}
+                      onChange={(e) => setNovaMensagem(e.target.value)}
+                      placeholder="Escreva uma atualização, resposta ou nota..."
+                      className="bg-gray-800 border-gray-600 text-white min-h-[100px]"
+                    />
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="visivel"
+                        checked={visivelLoja}
+                        onCheckedChange={setVisivelLoja}
+                        className="border-gray-600"
+                      />
+                      <label
+                        htmlFor="visivel"
+                        className="text-sm text-white cursor-pointer"
+                      >
+                        Visível para a loja
+                      </label>
+                    </div>
+
+                    <Button
+                      onClick={handleAddUpdate}
+                      disabled={saving || !novaMensagem.trim()}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          A adicionar...
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Adicionar Atualização
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
