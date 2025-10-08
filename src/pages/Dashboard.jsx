@@ -227,8 +227,8 @@ export default function Dashboard() {
               type="text"
               placeholder="Pesquisar por matrícula, marca, modelo ou tipo de vidro..."
               value={pesquisa}
-              onChange={(e) => setPesquisa(e.target.value)}
-              className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              onChange={(e) => setPesquisa(e.target.value.toUpperCase())}
+              className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 uppercase"
             />
           </div>
           {filtroStatus && (
