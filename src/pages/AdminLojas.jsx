@@ -329,6 +329,7 @@ export default function AdminLojas() {
           </DialogContent>
         </Dialog>
       </div>
+      </div>
 
       {/* Tabela de Lojas */}
       <Card>
