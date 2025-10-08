@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Loader2, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Users, Key } from 'lucide-react';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -18,8 +18,11 @@ export default function AdminUsers() {
   const [error, setError] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
+  const [resettingUser, setResettingUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -125,6 +128,30 @@ export default function AdminUsers() {
       await loadData();
     } catch (err) {
       setError(err.message || 'Erro ao eliminar utilizador');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resettingUser || !newPassword) return;
+
+    if (newPassword.length < 6) {
+      setError('Password deve ter pelo menos 6 caracteres');
+      return;
+    }
+
+    setError('');
+    setSubmitting(true);
+
+    try {
+      await adminAPI.resetPassword(resettingUser.id, newPassword);
+      setResetPasswordDialogOpen(false);
+      setResettingUser(null);
+      setNewPassword('');
+      alert('Password alterada com sucesso!');
+    } catch (err) {
+      setError(err.message || 'Erro ao repor password');
     } finally {
       setSubmitting(false);
     }
@@ -350,8 +377,21 @@ export default function AdminUsers() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleOpenDialog(user)}
+                            title="Editar utilizador"
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setResettingUser(user);
+                              setNewPassword('');
+                              setResetPasswordDialogOpen(true);
+                            }}
+                            title="Repor password"
+                          >
+                            <Key className="h-4 w-4 text-orange-600" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -360,6 +400,7 @@ export default function AdminUsers() {
                               setDeletingUser(user);
                               setDeleteDialogOpen(true);
                             }}
+                            title="Eliminar utilizador"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
@@ -373,6 +414,63 @@ export default function AdminUsers() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog de Reset Password */}
+      <Dialog open={resetPasswordDialogOpen} onOpenChange={setResetPasswordDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Repor Password</DialogTitle>
+            <DialogDescription>
+              Definir nova password para o utilizador <strong>{resettingUser?.name}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-password">Nova Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Mínimo 6 caracteres"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={submitting}
+              />
+            </div>
+          </div>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setResetPasswordDialogOpen(false);
+                setResettingUser(null);
+                setNewPassword('');
+                setError('');
+              }}
+              disabled={submitting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={submitting || !newPassword}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  A alterar...
+                </>
+              ) : (
+                'Alterar Password'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de Confirmação de Eliminação */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

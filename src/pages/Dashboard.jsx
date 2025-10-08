@@ -244,47 +244,47 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Estatísticas (apenas para admin) */}
-      {user?.role === 'admin' && stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Lojas</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+      {/* Painel Admin */}
+      {user?.role === 'admin' && (
+        <div className="text-center py-12">
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-3xl">Painel de Administração</CardTitle>
+              <CardDescription className="text-lg mt-2">
+                Gerir lojas e utilizadores do sistema
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total_lojas}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Utilizadores</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total_users}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Pedidos</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total_pedidos}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pedidos Pendentes</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.pedidos_por_status?.find(s => s.status === 'pendente')?.count || 0}
+            <CardContent className="space-y-4">
+              <p className="text-gray-600">
+                Utilize o menu de navegação para aceder às páginas de gestão:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-xl">
+                      <Package className="mr-2 h-6 w-6 text-blue-600" />
+                      Gestão de Lojas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600">
+                      Criar, editar e eliminar lojas do sistema
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-xl">
+                      <TrendingUp className="mr-2 h-6 w-6 text-green-600" />
+                      Gestão de Utilizadores
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600">
+                      Criar, editar, eliminar e repor passwords
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>

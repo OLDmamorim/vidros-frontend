@@ -102,6 +102,19 @@ export const adminAPI = {
     return response.json();
   },
 
+  resetPassword: async (id, new_password) => {
+    const response = await fetch(`${API_URL}/api/admin/users/${id}/reset-password`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ new_password })
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Erro ao repor password');
+    }
+    return response.json();
+  },
+
   getStats: async () => {
     const response = await fetch(`${API_URL}/api/admin/stats`, {
       headers: getAuthHeaders()
