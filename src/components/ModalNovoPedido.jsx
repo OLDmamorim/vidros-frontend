@@ -11,14 +11,35 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fotos, setFotos] = useState([]);
+  const [tiposVidroSelecionados, setTiposVidroSelecionados] = useState([]);
+  const [outroTipoVidro, setOutroTipoVidro] = useState('');
   const [formData, setFormData] = useState({
     matricula: '',
     marca_carro: '',
     modelo_carro: '',
     ano_carro: '',
-    tipo_vidro: '',
     descricao: ''
   });
+
+  const tiposVidroDisponiveis = [
+    '1 - Pára-Brisas',
+    '2 - Custódia Frente Direita',
+    '3 - Triângulo Prt Dir. Frente',
+    '4 - Lateral Direito Passageiro',
+    '5 - Lateral Direito Traseiro',
+    '6 - Triângulo Prt Dir. Traseira',
+    '7 - Custódia Traseira Direita',
+    '8 - Óculo Traseiro Direito',
+    '9 - Óculo Traseiro',
+    '10 - Óculo Traseiro Esquerdo',
+    '11 - Custódia Traseira Esquerda',
+    '12 - Triângulo Prt Esq. Traseira',
+    '13 - Lateral Esquerdo Traseiro',
+    '14 - Lateral Esquerdo Condutor',
+    '15 - Triângulo Prt Esq. Frente',
+    '16 - Custódia Frente Esquerda',
+    '17 - Tecto'
+  ];
 
   const formatMatricula = (value) => {
     const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -65,15 +86,36 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
     setFotos(prev => prev.filter((_, i) => i !== index));
   };
 
+  const toggleTipoVidro = (tipo) => {
+    setTiposVidroSelecionados(prev => 
+      prev.includes(tipo) 
+        ? prev.filter(t => t !== tipo)
+        : [...prev, tipo]
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validar que pelo menos um tipo foi selecionado
+    const todosTipos = [...tiposVidroSelecionados];
+    if (outroTipoVidro.trim()) {
+      todosTipos.push(outroTipoVidro.trim().toUpperCase());
+    }
+
+    if (todosTipos.length === 0) {
+      setError('Selecione pelo menos um tipo de vidro');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const pedidoData = {
         ...formData,
         ano_carro: formData.ano_carro ? parseInt(formData.ano_carro) : null,
+        tipo_vidro: todosTipos.join(', '),
         fotos: fotos.map(f => f.url)
       };
 
@@ -85,10 +127,11 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
         marca_carro: '',
         modelo_carro: '',
         ano_carro: '',
-        tipo_vidro: '',
         descricao: ''
       });
       setFotos([]);
+      setTiposVidroSelecionados([]);
+      setOutroTipoVidro('');
       
       onSuccess();
       onClose();
@@ -187,17 +230,35 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tipo_vidro" className="text-gray-300">Tipo de Vidro *</Label>
-              <Input
-                id="tipo_vidro"
-                name="tipo_vidro"
-                placeholder="Ex: VIDRO PORTA FRENTE ESQUERDA"
-                value={formData.tipo_vidro}
-                onChange={handleInputChange}
-                required
-                disabled={loading}
-                className="uppercase bg-gray-700 border-gray-600 text-white"
-              />
+              <Label className="text-gray-300">Tipo de Vidro * (selecione um ou mais)</Label>
+              <div className="bg-gray-700 border border-gray-600 rounded-md p-3 max-h-64 overflow-y-auto space-y-2">
+                {tiposVidroDisponiveis.map((tipo) => (
+                  <label key={tipo} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-600 p-2 rounded">
+                    <input
+                      type="checkbox"
+                      checked={tiposVidroSelecionados.includes(tipo)}
+                      onChange={() => toggleTipoVidro(tipo)}
+                      disabled={loading}
+                      className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-500 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-white text-sm">{tipo}</span>
+                  </label>
+                ))}
+                <div className="pt-2 border-t border-gray-600">
+                  <Input
+                    placeholder="Outro (especifique)"
+                    value={outroTipoVidro}
+                    onChange={(e) => setOutroTipoVidro(e.target.value)}
+                    disabled={loading}
+                    className="uppercase bg-gray-800 border-gray-500 text-white text-sm"
+                  />
+                </div>
+              </div>
+              {tiposVidroSelecionados.length > 0 && (
+                <div className="text-sm text-gray-400 mt-1">
+                  {tiposVidroSelecionados.length} tipo(s) selecionado(s)
+                </div>
+              )}
             </div>
           </div>
 
