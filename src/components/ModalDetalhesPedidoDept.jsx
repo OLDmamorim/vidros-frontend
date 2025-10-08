@@ -98,10 +98,10 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
   const getStatusConfig = (status) => {
     const configs = {
       pendente: { label: 'Pendente', color: 'bg-yellow-500' },
-      em_progresso: { label: 'Em Progresso', color: 'bg-blue-500' },
+      em_progresso: { label: 'A Tratar', color: 'bg-blue-500' },
       respondido: { label: 'Respondido', color: 'bg-yellow-400' },
       aguarda_resposta: { label: 'Aguarda Resposta', color: 'bg-yellow-400' },
-      encontrado: { label: 'Encontrado', color: 'bg-green-500' },
+      encontrado: { label: 'Encomendado', color: 'bg-green-500' },
       concluido: { label: 'Concluído', color: 'bg-green-600' },
       cancelado: { label: 'Cancelado', color: 'bg-red-500' }
     };
@@ -280,8 +280,8 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                         </SelectTrigger>
                         <SelectContent className="bg-gray-800 border-gray-600">
                           <SelectItem value="pendente">Pendente</SelectItem>
-                          <SelectItem value="em_progresso">Em Progresso</SelectItem>
-                          <SelectItem value="encontrado">Encontrado</SelectItem>
+                          <SelectItem value="em_progresso">A Tratar</SelectItem>
+                          <SelectItem value="encontrado">Encomendado</SelectItem>
                           <SelectItem value="concluido">Concluído</SelectItem>
                           <SelectItem value="cancelado">Cancelado</SelectItem>
                         </SelectContent>

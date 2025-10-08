@@ -70,10 +70,10 @@ export default function Pedidos() {
   const getStatusConfig = (status) => {
     const configs = {
       pendente: { label: 'Pendente', color: 'bg-yellow-500', textColor: 'text-yellow-300' },
-      em_progresso: { label: 'Em Progresso', color: 'bg-blue-500', textColor: 'text-blue-300' },
+      em_progresso: { label: 'A Tratar', color: 'bg-blue-500', textColor: 'text-blue-300' },
       respondido: { label: 'Respondido', color: 'bg-yellow-400', textColor: 'text-yellow-300' },
       aguarda_resposta: { label: 'Aguarda Resposta', color: 'bg-yellow-400', textColor: 'text-yellow-300' },
-      encontrado: { label: 'Encontrado', color: 'bg-green-500', textColor: 'text-green-300' },
+      encontrado: { label: 'Encomendado', color: 'bg-green-500', textColor: 'text-green-300' },
       concluido: { label: 'Concluído', color: 'bg-green-600', textColor: 'text-green-300' },
       cancelado: { label: 'Cancelado', color: 'bg-red-500', textColor: 'text-red-300' }
     };
@@ -129,10 +129,10 @@ export default function Pedidos() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
           {[
             { status: 'pendente', label: 'Pendente', color: 'bg-yellow-500' },
-            { status: 'em_progresso', label: 'Em Progresso', color: 'bg-blue-500' },
+            { status: 'em_progresso', label: 'A Tratar', color: 'bg-blue-500' },
             { status: 'respondido', label: 'Respondido', color: 'bg-yellow-400' },
             { status: 'aguarda_resposta', label: 'Aguarda Resposta', color: 'bg-yellow-400' },
-            { status: 'encontrado', label: 'Encontrado', color: 'bg-green-500' },
+            { status: 'encontrado', label: 'Encomendado', color: 'bg-green-500' },
             { status: 'concluido', label: 'Concluído', color: 'bg-green-600' },
             { status: 'cancelado', label: 'Cancelado', color: 'bg-red-500' }
           ].map(({ status, label, color }) => {
