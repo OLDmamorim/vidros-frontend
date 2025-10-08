@@ -186,7 +186,7 @@ export default function Dashboard() {
 
       {/* Dashboard da Loja e Departamento */}
       {(user?.role === 'loja' || user?.role === 'departamento') && pedidosStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {/* Botão Todos */}
           <Card 
             className={`bg-gray-700 border-gray-600 cursor-pointer transition-all hover:scale-105 ${
@@ -194,13 +194,13 @@ export default function Dashboard() {
             }`}
             onClick={() => setFiltroStatus(null)}
           >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-gray-300 min-h-[32px] flex items-start">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-300 min-h-[32px] flex items-start">
                 Todos
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-400">
+              <div className="text-5xl font-bold text-blue-400">
                 {pedidos.length}
               </div>
             </CardContent>
@@ -225,8 +225,8 @@ export default function Dashboard() {
                 } ${isActive ? `ring-2 ring-${config.color.replace('bg-', '')}` : ''}`}
                 onClick={() => handleStatusClick(status)}
               >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-300 min-h-[32px] flex items-start">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-300 min-h-[32px] flex items-start">
                     {config.label}
                     {shouldPulse && comAtualizacoesNovas > 0 && (
                       <span className="ml-1 text-yellow-300">({comAtualizacoesNovas})</span>
@@ -234,7 +234,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-3xl font-bold ${config.textColor} ${shouldPulse ? 'animate-pulse' : ''}`}>
+                  <div className={`text-5xl font-bold ${config.textColor} ${shouldPulse ? 'animate-pulse' : ''}`}>
                     {count}
                   </div>
                 </CardContent>

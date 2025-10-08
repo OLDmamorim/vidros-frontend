@@ -124,7 +124,7 @@ export default function Pedidos() {
         </div>
 
         {/* Dashboard de Totalizadores */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
           {[
             { status: 'pendente', label: 'Pendente', color: 'bg-yellow-500' },
             { status: 'em_progresso', label: 'A Tratar', color: 'bg-blue-500' },
@@ -144,12 +144,12 @@ export default function Pedidos() {
                 } ${pisca ? 'animate-pulse' : ''}`}
                 onClick={() => setFiltroStatus(filtroStatus === status ? null : status)}
               >
-                <CardContent className="p-4">
+                <CardContent className="p-5">
                   <div className="text-center">
-                    <div className={`text-3xl font-bold ${getStatusConfig(status).textColor}`}>
+                    <div className={`text-5xl font-bold ${getStatusConfig(status).textColor}`}>
                       {total}
                     </div>
-                    <div className="text-xs text-gray-400 mt-1 min-h-[32px] flex items-center justify-center">{label}</div>
+                    <div className="text-sm text-gray-400 mt-2 min-h-[32px] flex items-center justify-center">{label}</div>
                     {comAtualizacoes > 0 && (
                       <div className="text-xs text-yellow-400 mt-1">
                         ({comAtualizacoes} novos)
