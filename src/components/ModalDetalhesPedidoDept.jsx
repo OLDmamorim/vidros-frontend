@@ -280,8 +280,6 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                         <SelectContent className="bg-gray-800 border-gray-600">
                           <SelectItem value="pendente">Pendente</SelectItem>
                           <SelectItem value="em_progresso">Em Progresso</SelectItem>
-                          <SelectItem value="respondido">Respondido</SelectItem>
-                          <SelectItem value="aguarda_resposta">Aguarda Resposta</SelectItem>
                           <SelectItem value="encontrado">Encontrado</SelectItem>
                           <SelectItem value="concluido">Concluído</SelectItem>
                           <SelectItem value="cancelado">Cancelado</SelectItem>
