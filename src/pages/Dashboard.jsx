@@ -27,6 +27,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadData();
+    
+    // Auto-refresh a cada 5 segundos
+    const interval = setInterval(() => {
+      loadData();
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
