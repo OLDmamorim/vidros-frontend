@@ -199,7 +199,7 @@ export default function Dashboard() {
             onClick={() => setFiltroStatus(null)}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-gray-300">
+              <CardTitle className="text-xs font-medium text-gray-300 min-h-[32px] flex items-start">
                 Todos
               </CardTitle>
             </CardHeader>
@@ -230,7 +230,7 @@ export default function Dashboard() {
                 onClick={() => handleStatusClick(status)}
               >
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-300">
+                  <CardTitle className="text-xs font-medium text-gray-300 min-h-[32px] flex items-start">
                     {config.label}
                     {shouldPulse && comAtualizacoesNovas > 0 && (
                       <span className="ml-1 text-yellow-300">({comAtualizacoesNovas})</span>
