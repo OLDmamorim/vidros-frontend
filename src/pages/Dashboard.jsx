@@ -183,7 +183,26 @@ export default function Dashboard() {
 
       {/* Dashboard da Loja e Departamento */}
       {(user?.role === 'loja' || user?.role === 'departamento') && pedidosStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+          {/* Botão Todos */}
+          <Card 
+            className={`bg-gray-700 border-gray-600 cursor-pointer transition-all hover:scale-105 ${
+              filtroStatus === null ? 'ring-2 ring-blue-500' : ''
+            }`}
+            onClick={() => setFiltroStatus(null)}
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs font-medium text-gray-300">
+                Todos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-400">
+                {pedidos.length}
+              </div>
+            </CardContent>
+          </Card>
+
           {Object.entries(pedidosStats).map(([status, count]) => {
             const config = getStatusConfig(status);
             const isActive = filtroStatus === status;
