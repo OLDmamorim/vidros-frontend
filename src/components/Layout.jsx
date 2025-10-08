@@ -28,7 +28,6 @@ export default function Layout() {
   // Apenas admin e departamento têm navegação
   const navItems = user?.role !== 'loja' ? [
     { path: '/', label: 'Início', icon: Home, roles: ['admin', 'departamento'] },
-    { path: '/pedidos', label: 'Pedidos', icon: FileText, roles: ['departamento'] },
     { path: '/admin/lojas', label: 'Lojas', icon: Store, roles: ['admin'] },
     { path: '/admin/users', label: 'Utilizadores', icon: Users, roles: ['admin'] },
   ].filter(item => item.roles.includes(user?.role)) : [];
