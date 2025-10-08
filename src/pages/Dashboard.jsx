@@ -179,8 +179,8 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Totalizadores para Loja */}
-      {user?.role === 'loja' && pedidosStats && (
+          {/* Dashboard da Loja e Departamento */}
+      {(user?.role === 'loja' || user?.role === 'departamento') && pedidosStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {Object.entries(pedidosStats).map(([status, count]) => {
             const config = getStatusConfig(status);
