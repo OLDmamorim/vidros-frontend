@@ -41,11 +41,13 @@ export default function Layout() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-              <span className="font-bold text-xl text-gray-900 hidden sm:block">
-                Vidros Especiais
+              <img 
+                src="/logo.png" 
+                alt="ExpressGlass" 
+                className="h-10 w-auto"
+              />
+              <span className="font-bold text-xl text-gray-900">
+                VIDROS ESPECIAIS
               </span>
             </Link>
 
