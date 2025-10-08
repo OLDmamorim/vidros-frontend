@@ -212,54 +212,68 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="ano_carro" className="text-gray-300">Ano</Label>
-              <Input
-                id="ano_carro"
-                name="ano_carro"
-                type="number"
-                placeholder="Ex: 2015"
-                value={formData.ano_carro}
-                onChange={handleInputChange}
-                disabled={loading}
-                min="1900"
-                max={new Date().getFullYear() + 1}
-                className="bg-gray-700 border-gray-600 text-white"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="ano_carro" className="text-gray-300">Ano</Label>
+            <Input
+              id="ano_carro"
+              name="ano_carro"
+              type="number"
+              placeholder="Ex: 2015"
+              value={formData.ano_carro}
+              onChange={handleInputChange}
+              disabled={loading}
+              min="1900"
+              max={new Date().getFullYear() + 1}
+              className="bg-gray-700 border-gray-600 text-white"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label className="text-gray-300">Tipo de Vidro * (selecione um ou mais)</Label>
-              <div className="bg-gray-700 border border-gray-600 rounded-md p-3 max-h-64 overflow-y-auto space-y-2">
-                {tiposVidroDisponiveis.map((tipo) => (
-                  <label key={tipo} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-600 p-2 rounded">
-                    <input
-                      type="checkbox"
-                      checked={tiposVidroSelecionados.includes(tipo)}
-                      onChange={() => toggleTipoVidro(tipo)}
-                      disabled={loading}
-                      className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-500 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-white text-sm">{tipo}</span>
-                  </label>
-                ))}
-                <div className="pt-2 border-t border-gray-600">
-                  <Input
-                    placeholder="Outro (especifique)"
-                    value={outroTipoVidro}
-                    onChange={(e) => setOutroTipoVidro(e.target.value)}
-                    disabled={loading}
-                    className="uppercase bg-gray-800 border-gray-500 text-white text-sm"
-                  />
-                </div>
-              </div>
-              {tiposVidroSelecionados.length > 0 && (
-                <div className="text-sm text-gray-400 mt-1">
-                  {tiposVidroSelecionados.length} tipo(s) selecionado(s)
-                </div>
-              )}
+          {/* Imagem de Referência dos Tipos de Vidro */}
+          <div className="space-y-2">
+            <Label className="text-gray-300">Referência de Identificação de Vidros</Label>
+            <div className="bg-gray-700 border border-gray-600 rounded-md p-3">
+              <img 
+                src="/glass-reference.jpg" 
+                alt="Referência de tipos de vidros de automóvel" 
+                className="w-full h-auto rounded"
+              />
+              <p className="text-xs text-gray-400 mt-2 text-center">
+                Use esta imagem como referência para identificar os tipos de vidro
+              </p>
             </div>
+          </div>
+
+          {/* Seleção de Tipos de Vidro */}
+          <div className="space-y-2">
+            <Label className="text-gray-300">Tipo de Vidro * (selecione um ou mais)</Label>
+            <div className="bg-gray-700 border border-gray-600 rounded-md p-3 max-h-64 overflow-y-auto space-y-2">
+              {tiposVidroDisponiveis.map((tipo) => (
+                <label key={tipo} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-600 p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={tiposVidroSelecionados.includes(tipo)}
+                    onChange={() => toggleTipoVidro(tipo)}
+                    disabled={loading}
+                    className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-500 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-white text-sm">{tipo}</span>
+                </label>
+              ))}
+              <div className="pt-2 border-t border-gray-600">
+                <Input
+                  placeholder="Outro (especifique)"
+                  value={outroTipoVidro}
+                  onChange={(e) => setOutroTipoVidro(e.target.value)}
+                  disabled={loading}
+                  className="uppercase bg-gray-800 border-gray-500 text-white text-sm"
+                />
+              </div>
+            </div>
+            {tiposVidroSelecionados.length > 0 && (
+              <div className="text-sm text-gray-400 mt-1">
+                {tiposVidroSelecionados.length} tipo(s) selecionado(s)
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
