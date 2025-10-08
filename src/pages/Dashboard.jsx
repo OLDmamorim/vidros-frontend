@@ -70,10 +70,17 @@ export default function Dashboard() {
   const aplicarFiltros = () => {
     let resultado = [...pedidos];
 
+    // Ocultar cancelados por padrão (só mostra se filtro ativo)
+    if (filtroStatus !== 'cancelado') {
+      resultado = resultado.filter(p => p.status !== 'cancelado');
+    }
+
+    // Filtro por status
     if (filtroStatus) {
       resultado = resultado.filter(p => p.status === filtroStatus);
     }
 
+    // Filtro por pesquisa
     if (pesquisa.trim()) {
       const termo = pesquisa.toLowerCase();
       resultado = resultado.filter(p => 
@@ -118,8 +125,10 @@ export default function Dashboard() {
     });
   };
 
-  const isPendente = (status) => {
-    return status === 'respondido' || status === 'aguarda_resposta';
+  // Verifica se deve piscar: tem atualizações novas E está em status respondido/aguarda_resposta
+  const devePiscar = (pedido) => {
+    const statusPiscantes = ['respondido', 'aguarda_resposta'];
+    return statusPiscantes.includes(pedido.status) && pedido.tem_atualizacoes_novas === true;
   };
 
   if (loading) {
@@ -162,7 +171,13 @@ export default function Dashboard() {
           {Object.entries(pedidosStats).map(([status, count]) => {
             const config = getStatusConfig(status);
             const isActive = filtroStatus === status;
-            const shouldPulse = isPendente(status);
+            
+            // Contar quantos pedidos deste status têm atualizações novas
+            const comAtualizacoesNovas = pedidos.filter(p => 
+              p.status === status && devePiscar(p)
+            ).length;
+            
+            const shouldPulse = comAtualizacoesNovas > 0;
             
             return (
               <Card 
@@ -173,7 +188,12 @@ export default function Dashboard() {
                 onClick={() => handleStatusClick(status)}
               >
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium text-gray-300">{config.label}</CardTitle>
+                  <CardTitle className="text-xs font-medium text-gray-300">
+                    {config.label}
+                    {shouldPulse && comAtualizacoesNovas > 0 && (
+                      <span className="ml-1 text-yellow-300">({comAtualizacoesNovas})</span>
+                    )}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className={`text-3xl font-bold ${config.textColor} ${shouldPulse ? 'animate-pulse' : ''}`}>
@@ -264,7 +284,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">
-              {filtroStatus ? `${getStatusConfig(filtroStatus).label}` : 'Todos os Pedidos'}
+              {filtroStatus ? `${getStatusConfig(filtroStatus).label}` : 'Pedidos Ativos'}
             </h2>
             <span className="text-gray-400 text-sm">{pedidosFiltrados.length} pedido(s)</span>
           </div>
@@ -280,7 +300,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {pedidosFiltrados.map((pedido) => {
                 const statusConfig = getStatusConfig(pedido.status);
-                const shouldPulse = isPendente(pedido.status);
+                const shouldPulse = devePiscar(pedido);
                 
                 return (
                   <Card
@@ -319,7 +339,7 @@ export default function Dashboard() {
                             <span>📷 {pedido.total_fotos}</span>
                           )}
                           {pedido.total_updates > 0 && (
-                            <span className={shouldPulse ? 'font-bold text-yellow-400' : ''}>
+                            <span className={shouldPulse ? 'font-bold text-yellow-300 animate-pulse' : ''}>
                               💬 {pedido.total_updates}
                             </span>
                           )}
