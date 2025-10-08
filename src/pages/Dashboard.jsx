@@ -195,12 +195,12 @@ export default function Dashboard() {
             onClick={() => setFiltroStatus(null)}
           >
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-300 min-h-[32px] flex items-start">
+              <CardTitle className="text-base font-medium text-gray-300 min-h-[32px] flex items-center justify-center">
                 Todos
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-5xl font-bold text-blue-400">
+              <div className="text-5xl font-bold text-blue-400 text-center">
                 {pedidos.length}
               </div>
             </CardContent>
@@ -226,7 +226,7 @@ export default function Dashboard() {
                 onClick={() => handleStatusClick(status)}
               >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-300 min-h-[32px] flex items-start">
+                  <CardTitle className="text-base font-medium text-gray-300 min-h-[32px] flex items-center justify-center">
                     {config.label}
                     {shouldPulse && comAtualizacoesNovas > 0 && (
                       <span className="ml-1 text-yellow-300">({comAtualizacoesNovas})</span>
@@ -234,7 +234,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-5xl font-bold ${config.textColor} ${shouldPulse ? 'animate-pulse' : ''}`}>
+                  <div className={`text-5xl font-bold text-center ${config.textColor} ${shouldPulse ? 'animate-pulse' : ''}`}>
                     {count}
                   </div>
                 </CardContent>

@@ -149,7 +149,7 @@ export default function Pedidos() {
                     <div className={`text-5xl font-bold ${getStatusConfig(status).textColor}`}>
                       {total}
                     </div>
-                    <div className="text-sm text-gray-400 mt-2 min-h-[32px] flex items-center justify-center">{label}</div>
+                    <div className="text-base text-gray-400 mt-2 min-h-[32px] flex items-center justify-center">{label}</div>
                     {comAtualizacoes > 0 && (
                       <div className="text-xs text-yellow-400 mt-1">
                         ({comAtualizacoes} novos)
