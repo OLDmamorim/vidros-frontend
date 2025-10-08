@@ -22,23 +22,23 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
   });
 
   const tiposVidroDisponiveis = [
-    '1 - Pára-Brisas',
-    '2 - Custódia Frente Direita',
-    '3 - Triângulo Prt Dir. Frente',
-    '4 - Lateral Direito Passageiro',
-    '5 - Lateral Direito Traseiro',
-    '6 - Triângulo Prt Dir. Traseira',
-    '7 - Custódia Traseira Direita',
-    '8 - Óculo Traseiro Direito',
-    '9 - Óculo Traseiro',
-    '10 - Óculo Traseiro Esquerdo',
-    '11 - Custódia Traseira Esquerda',
-    '12 - Triângulo Prt Esq. Traseira',
-    '13 - Lateral Esquerdo Traseiro',
-    '14 - Lateral Esquerdo Condutor',
-    '15 - Triângulo Prt Esq. Frente',
-    '16 - Custódia Frente Esquerda',
-    '17 - Tecto'
+    'Pára-Brisas',
+    'Custódia Frente Direita',
+    'Triângulo Prt Dir. Frente',
+    'Lateral Direito Passageiro',
+    'Lateral Direito Traseiro',
+    'Triângulo Prt Dir. Traseira',
+    'Custódia Traseira Direita',
+    'Óculo Traseiro Direito',
+    'Óculo Traseiro',
+    'Óculo Traseiro Esquerdo',
+    'Custódia Traseira Esquerda',
+    'Triângulo Prt Esq. Traseira',
+    'Lateral Esquerdo Traseiro',
+    'Lateral Esquerdo Condutor',
+    'Triângulo Prt Esq. Frente',
+    'Custódia Frente Esquerda',
+    'Tecto'
   ];
 
   const formatMatricula = (value) => {
@@ -226,21 +226,6 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
               max={new Date().getFullYear() + 1}
               className="bg-gray-700 border-gray-600 text-white"
             />
-          </div>
-
-          {/* Imagem de Referência dos Tipos de Vidro */}
-          <div className="space-y-2">
-            <Label className="text-gray-300">Referência de Identificação de Vidros</Label>
-            <div className="bg-gray-700 border border-gray-600 rounded-md p-3">
-              <img 
-                src="/glass-reference-pt.jpg" 
-                alt="Referência de tipos de vidros de automóvel" 
-                className="w-full h-auto rounded"
-              />
-              <p className="text-xs text-gray-400 mt-2 text-center">
-                Use esta imagem como referência para identificar os tipos de vidro
-              </p>
-            </div>
           </div>
 
           {/* Seleção de Tipos de Vidro */}
