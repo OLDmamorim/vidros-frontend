@@ -189,7 +189,10 @@ export const pedidosAPI = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
-    if (!response.ok) throw new Error('Erro ao adicionar update');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Erro ao adicionar update');
+    }
     return response.json();
   },
 

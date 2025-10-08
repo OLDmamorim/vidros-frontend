@@ -87,6 +87,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
       await loadPedido();
       if (onUpdate) onUpdate();
     } catch (err) {
+      console.error('Erro detalhado ao adicionar update:', err);
       setError(err.message || 'Erro ao adicionar atualização');
     } finally {
       setSaving(false);
