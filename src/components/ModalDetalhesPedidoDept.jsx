@@ -61,8 +61,8 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
         fornecedor: fornecedor || null
       });
 
-      await loadPedido();
       if (onUpdate) onUpdate();
+      onClose(); // Fechar modal após salvar
     } catch (err) {
       setError(err.message || 'Erro ao guardar alterações');
     } finally {
@@ -82,10 +82,8 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
         visivel_loja: visivelLoja
       });
 
-      setNovaMensagem('');
-      setVisivelLoja(true);
-      await loadPedido();
       if (onUpdate) onUpdate();
+      onClose(); // Fechar modal após adicionar update
     } catch (err) {
       console.error('Erro detalhado ao adicionar update:', err);
       setError(err.message || 'Erro ao adicionar atualização');

@@ -75,9 +75,8 @@ export default function ModalDetalhesPedido({ pedidoId, isOpen, onClose, onUpdat
         visivel_loja: false // Mensagens da loja são internas por padrão
       });
 
-      setNovaMensagem('');
-      await loadPedido();
       if (onUpdate) onUpdate();
+      onClose(); // Fechar modal após enviar mensagem
     } catch (err) {
       console.error('Erro detalhado ao adicionar mensagem:', err);
       setError(err.message || 'Erro ao adicionar mensagem');
