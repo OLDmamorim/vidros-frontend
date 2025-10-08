@@ -22,6 +22,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
   const [disponibilidade, setDisponibilidade] = useState('');
   const [custo, setCusto] = useState('');
   const [fornecedor, setFornecedor] = useState('');
+  const [notas, setNotas] = useState('');
   
   // Nova atualização
   const [novaMensagem, setNovaMensagem] = useState('');
@@ -44,6 +45,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
       setDisponibilidade(data.disponibilidade || '');
       setCusto(data.custo || '');
       setFornecedor(data.fornecedor || '');
+      setNotas(data.notas || '');
     } catch (err) {
       setError(err.message || 'Erro ao carregar pedido');
     } finally {
@@ -61,7 +63,8 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
         valor: valor ? parseFloat(valor) : null,
         disponibilidade: disponibilidade || null,
         custo: custo ? parseFloat(custo) : null,
-        fornecedor: fornecedor || null
+        fornecedor: fornecedor || null,
+        notas: notas || null
       });
 
       if (onUpdate) onUpdate();
@@ -348,6 +351,19 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                         onChange={(e) => setFornecedor(e.target.value.toUpperCase())}
                         placeholder="Nome do fornecedor"
                         className="bg-gray-800 border-gray-600 text-white uppercase"
+                      />
+                    </div>
+
+                    {/* Notas (Apenas Departamento) */}
+                    <div>
+                      <label className="text-xs text-gray-400 uppercase tracking-wide block mb-2">
+                        Notas <span className="text-red-400">(Apenas Departamento)</span>
+                      </label>
+                      <Textarea
+                        value={notas}
+                        onChange={(e) => setNotas(e.target.value)}
+                        placeholder="Notas internas sobre o pedido..."
+                        className="bg-gray-800 border-gray-600 text-white min-h-[100px]"
                       />
                     </div>
 
