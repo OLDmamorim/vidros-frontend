@@ -1,5 +1,5 @@
 // Configuração da URL da API
-const API_URL = 'https://vidros-backend-production.up.railway.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://vidros-backend-production.up.railway.app';
 
 console.log('API_URL configurado:', API_URL);
 
