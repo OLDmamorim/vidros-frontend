@@ -447,7 +447,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                             </Badge>
                           </div>
                           <p className="text-white text-sm whitespace-pre-wrap ml-10">
-                            {update.mensagem}
+                            {update.conteudo || update.mensagem}
                           </p>
                         </div>
                       ))}

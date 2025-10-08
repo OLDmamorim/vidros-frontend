@@ -260,7 +260,7 @@ export default function ModalDetalhesPedido({ pedidoId, isOpen, onClose, onUpdat
                             </div>
                           </div>
                           <p className="text-white text-sm whitespace-pre-wrap ml-10">
-                            {update.mensagem}
+                            {update.conteudo || update.mensagem}
                           </p>
                         </div>
                       ))}
