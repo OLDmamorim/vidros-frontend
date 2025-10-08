@@ -419,38 +419,43 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                   
                   {pedido.updates && pedido.updates.length > 0 ? (
                     <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-                      {pedido.updates.map((update) => (
-                        <div
-                          key={update.id}
-                          className={`bg-gray-800 rounded-lg p-4 border-l-4 ${
-                            update.visivel_loja ? 'border-green-500' : 'border-red-500'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                update.visivel_loja ? 'bg-green-600' : 'bg-red-600'
-                              }`}>
-                                <User className="h-4 w-4 text-white" />
+                      {pedido.updates.map((update) => {
+                        const isDepartamento = update.user_role === 'departamento' || update.user_role === 'admin';
+                        return (
+                          <div
+                            key={update.id}
+                            className={`rounded-lg p-4 border-l-4 ${
+                              isDepartamento 
+                                ? 'bg-gray-600 border-purple-400' 
+                                : 'bg-gray-800 border-blue-500'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                  isDepartamento ? 'bg-purple-500' : 'bg-blue-600'
+                                }`}>
+                                  <User className="h-4 w-4 text-white" />
+                                </div>
+                                <div>
+                                  <span className="text-sm font-medium text-white">
+                                    {update.user_name}
+                                  </span>
+                                  <p className="text-xs text-gray-400">
+                                    {formatDate(update.created_at)}
+                                  </p>
+                                </div>
                               </div>
-                              <div>
-                                <span className="text-sm font-medium text-white">
-                                  {update.user_name}
-                                </span>
-                                <p className="text-xs text-gray-400">
-                                  {formatDate(update.created_at)}
-                                </p>
-                              </div>
+                              <Badge variant="outline" className={update.visivel_loja ? 'text-green-400 border-green-400' : 'text-red-400 border-red-400'}>
+                                {update.visivel_loja ? 'Visível' : 'Interna'}
+                              </Badge>
                             </div>
-                            <Badge variant="outline" className={update.visivel_loja ? 'text-green-400 border-green-400' : 'text-red-400 border-red-400'}>
-                              {update.visivel_loja ? 'Visível' : 'Interna'}
-                            </Badge>
+                            <p className="text-white text-sm whitespace-pre-wrap ml-10">
+                              {update.conteudo || update.mensagem}
+                            </p>
                           </div>
-                          <p className="text-white text-sm whitespace-pre-wrap ml-10">
-                            {update.conteudo || update.mensagem}
-                          </p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-400">
