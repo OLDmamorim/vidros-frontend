@@ -1,34 +1,30 @@
-import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { pedidosAPI } from '../services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Eye, Package } from 'lucide-react';
+import { Search, Package, Calendar, Image as ImageIcon, MessageSquare, X } from 'lucide-react';
+import ModalDetalhesPedidoDept from '../components/ModalDetalhesPedidoDept';
 
 export default function Pedidos() {
   const { user } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'todos');
+  const [pesquisa, setPesquisa] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState(null);
+  const [modalDetalhesOpen, setModalDetalhesOpen] = useState(false);
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
 
   useEffect(() => {
-    loadPedidos();
-  }, [statusFilter]);
+    loadData();
+  }, []);
 
-  const loadPedidos = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const filters = {};
-      if (statusFilter !== 'todos') {
-        filters.status = statusFilter;
-      }
-      const data = await pedidosAPI.getPedidos(filters);
+      const data = await pedidosAPI.getPedidos();
       setPedidos(data);
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error);
@@ -37,20 +33,67 @@ export default function Pedidos() {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const variants = {
-      pendente: { variant: 'secondary', label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
-      em_progresso: { variant: 'default', label: 'Em Progresso', color: 'bg-blue-100 text-blue-800' },
-      encontrado: { variant: 'default', label: 'Encontrado', color: 'bg-green-100 text-green-800' },
-      concluido: { variant: 'default', label: 'Concluído', color: 'bg-gray-100 text-gray-800' },
-      cancelado: { variant: 'destructive', label: 'Cancelado', color: 'bg-red-100 text-red-800' }
+  const contarPorStatus = (status) => {
+    return pedidos.filter(p => p.status === status).length;
+  };
+
+  const contarComAtualizacoes = (status) => {
+    return pedidos.filter(p => p.status === status && p.tem_atualizacoes_novas).length;
+  };
+
+  const pedidosFiltrados = pedidos.filter(pedido => {
+    // Filtro de status
+    if (filtroStatus && pedido.status !== filtroStatus) {
+      return false;
+    }
+
+    // Ocultar cancelados por padrão (exceto se filtro ativo)
+    if (!filtroStatus && pedido.status === 'cancelado') {
+      return false;
+    }
+
+    // Filtro de pesquisa
+    if (pesquisa) {
+      const termo = pesquisa.toLowerCase();
+      return (
+        pedido.matricula?.toLowerCase().includes(termo) ||
+        pedido.marca_carro?.toLowerCase().includes(termo) ||
+        pedido.modelo_carro?.toLowerCase().includes(termo) ||
+        pedido.tipo_vidro?.toLowerCase().includes(termo) ||
+        pedido.loja_name?.toLowerCase().includes(termo)
+      );
+    }
+
+    return true;
+  });
+
+  const getStatusConfig = (status) => {
+    const configs = {
+      pendente: { label: 'Pendente', color: 'bg-yellow-500', textColor: 'text-yellow-300' },
+      em_progresso: { label: 'Em Progresso', color: 'bg-blue-500', textColor: 'text-blue-300' },
+      respondido: { label: 'Respondido', color: 'bg-yellow-400', textColor: 'text-yellow-300' },
+      aguarda_resposta: { label: 'Aguarda Resposta', color: 'bg-yellow-400', textColor: 'text-yellow-300' },
+      encontrado: { label: 'Encontrado', color: 'bg-green-500', textColor: 'text-green-300' },
+      concluido: { label: 'Concluído', color: 'bg-green-600', textColor: 'text-green-300' },
+      cancelado: { label: 'Cancelado', color: 'bg-red-500', textColor: 'text-red-300' }
     };
-    const config = variants[status] || variants.pendente;
-    return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
-        {config.label}
-      </span>
-    );
+    return configs[status] || configs.pendente;
+  };
+
+  const devePiscar = (pedido) => {
+    const statusPiscantes = ['respondido', 'aguarda_resposta'];
+    return statusPiscantes.includes(pedido.status) && pedido.tem_atualizacoes_novas === true;
+  };
+
+  const handlePedidoClick = (pedido) => {
+    setPedidoSelecionado(pedido.id);
+    setModalDetalhesOpen(true);
+  };
+
+  const handleCloseDetalhes = () => {
+    setModalDetalhesOpen(false);
+    setPedidoSelecionado(null);
+    loadData();
   };
 
   const formatDate = (dateString) => {
@@ -63,164 +106,180 @@ export default function Pedidos() {
     });
   };
 
-  const filteredPedidos = pedidos.filter(pedido => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      pedido.marca_carro.toLowerCase().includes(term) ||
-      pedido.modelo_carro.toLowerCase().includes(term) ||
-      pedido.tipo_vidro.toLowerCase().includes(term) ||
-      pedido.loja_name?.toLowerCase().includes(term)
-    );
-  });
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <div className="text-white text-xl">A carregar...</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gray-900 p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Pedidos</h1>
-          <p className="text-gray-600 mt-1">
-            Gestão de pedidos de vidros especiais
-          </p>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Gestão de Pedidos</h1>
+            <p className="text-gray-400 mt-1">Departamento de Vidros Especiais</p>
+          </div>
         </div>
-        {user?.role === 'loja' && (
-          <Link to="/pedidos/novo">
-            <Button className="w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Pedido
+
+        {/* Dashboard de Totalizadores */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+          {[
+            { status: 'pendente', label: 'Pendente', color: 'bg-yellow-500' },
+            { status: 'em_progresso', label: 'Em Progresso', color: 'bg-blue-500' },
+            { status: 'respondido', label: 'Respondido', color: 'bg-yellow-400' },
+            { status: 'aguarda_resposta', label: 'Aguarda Resposta', color: 'bg-yellow-400' },
+            { status: 'encontrado', label: 'Encontrado', color: 'bg-green-500' },
+            { status: 'concluido', label: 'Concluído', color: 'bg-green-600' },
+            { status: 'cancelado', label: 'Cancelado', color: 'bg-red-500' }
+          ].map(({ status, label, color }) => {
+            const total = contarPorStatus(status);
+            const comAtualizacoes = contarComAtualizacoes(status);
+            const pisca = ['respondido', 'aguarda_resposta'].includes(status) && comAtualizacoes > 0;
+
+            return (
+              <Card
+                key={status}
+                className={`bg-gray-800 border-gray-700 cursor-pointer transition-all hover:scale-105 ${
+                  filtroStatus === status ? 'ring-2 ring-blue-500' : ''
+                } ${pisca ? 'animate-pulse' : ''}`}
+                onClick={() => setFiltroStatus(filtroStatus === status ? null : status)}
+              >
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <div className={`text-3xl font-bold ${getStatusConfig(status).textColor}`}>
+                      {total}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">{label}</div>
+                    {comAtualizacoes > 0 && (
+                      <div className="text-xs text-yellow-400 mt-1">
+                        ({comAtualizacoes} novos)
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Campo de Pesquisa */}
+        <div className="flex items-center space-x-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Pesquisar por matrícula, marca, modelo, tipo de vidro ou loja..."
+              value={pesquisa}
+              onChange={(e) => setPesquisa(e.target.value.toUpperCase())}
+              className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 uppercase"
+            />
+          </div>
+          {filtroStatus && (
+            <Button 
+              onClick={() => setFiltroStatus(null)}
+              variant="outline"
+              className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+            >
+              <X className="mr-2 h-4 w-4" />
+              Limpar Filtro
             </Button>
-          </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Lista de Pedidos */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-white">
+            {filtroStatus ? `Pedidos: ${getStatusConfig(filtroStatus).label}` : 'Pedidos Ativos'}
+          </h2>
+          <span className="text-gray-400 text-sm">{pedidosFiltrados.length} pedido(s)</span>
+        </div>
+
+        {pedidosFiltrados.length === 0 ? (
+          <Card className="bg-gray-800 border-gray-700">
+            <CardContent className="p-12 text-center">
+              <Package className="mx-auto h-16 w-16 text-gray-600 mb-4" />
+              <p className="text-gray-400 text-lg">Nenhum pedido encontrado</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {pedidosFiltrados.map((pedido) => (
+              <Card
+                key={pedido.id}
+                className={`bg-gray-800 border-gray-700 cursor-pointer transition-all hover:scale-105 hover:shadow-xl ${
+                  devePiscar(pedido) ? 'animate-pulse ring-2 ring-yellow-400' : ''
+                }`}
+                onClick={() => handlePedidoClick(pedido)}
+              >
+                <CardContent className="p-5">
+                  {/* Matrícula e Status */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="text-2xl font-bold text-blue-300 font-mono">
+                      {pedido.matricula}
+                    </div>
+                    <Badge className={`${getStatusConfig(pedido.status).color} text-white text-xs`}>
+                      {getStatusConfig(pedido.status).label}
+                    </Badge>
+                  </div>
+
+                  {/* Marca e Modelo */}
+                  <div className="mb-3">
+                    <div className="text-white font-semibold text-lg">
+                      {pedido.marca_carro} {pedido.modelo_carro}
+                    </div>
+                    <div className="text-gray-400 text-sm mt-1">
+                      Ano: {pedido.ano_carro || 'N/A'}
+                    </div>
+                  </div>
+
+                  {/* Tipo de Vidro */}
+                  <div className="text-gray-300 text-sm mb-3 line-clamp-2">
+                    {pedido.tipo_vidro}
+                  </div>
+
+                  {/* Loja */}
+                  <div className="text-gray-400 text-xs mb-3 pb-3 border-b border-gray-700">
+                    <Package className="inline h-3 w-3 mr-1" />
+                    {pedido.loja_name}
+                  </div>
+
+                  {/* Rodapé */}
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {formatDate(pedido.created_at)}
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className="flex items-center">
+                        <ImageIcon className="h-3 w-3 mr-1" />
+                        {pedido.total_fotos || 0}
+                      </span>
+                      <span className={`flex items-center ${devePiscar(pedido) ? 'text-yellow-400 font-bold' : ''}`}>
+                        <MessageSquare className="h-3 w-3 mr-1" />
+                        {pedido.total_updates || 0}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Filtros */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Pesquisar por marca, modelo, tipo de vidro..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filtrar por status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os Status</SelectItem>
-                <SelectItem value="pendente">Pendente</SelectItem>
-                <SelectItem value="em_progresso">Em Progresso</SelectItem>
-                <SelectItem value="encontrado">Encontrado</SelectItem>
-                <SelectItem value="concluido">Concluído</SelectItem>
-                <SelectItem value="cancelado">Cancelado</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Lista de Pedidos */}
-      {filteredPedidos.length === 0 ? (
-        <Card>
-          <CardContent className="py-12">
-            <div className="text-center">
-              <Package className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Nenhum pedido encontrado</h3>
-              <p className="mt-2 text-gray-600">
-                {searchTerm || statusFilter !== 'todos'
-                  ? 'Tente ajustar os filtros de pesquisa'
-                  : user?.role === 'loja'
-                  ? 'Comece criando o seu primeiro pedido'
-                  : 'Ainda não existem pedidos no sistema'}
-              </p>
-              {user?.role === 'loja' && !searchTerm && statusFilter === 'todos' && (
-                <Link to="/pedidos/novo">
-                  <Button className="mt-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Criar Primeiro Pedido
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {filteredPedidos.map((pedido) => (
-            <Card key={pedido.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {pedido.marca_carro} {pedido.modelo_carro}
-                          {pedido.ano_carro && ` (${pedido.ano_carro})`}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          <span className="font-medium">Tipo:</span> {pedido.tipo_vidro}
-                        </p>
-                      </div>
-                      {getStatusBadge(pedido.status)}
-                    </div>
-                    
-                    {user?.role !== 'loja' && (
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Loja:</span> {pedido.loja_name}
-                      </p>
-                    )}
-                    
-                    {pedido.descricao && (
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {pedido.descricao}
-                      </p>
-                    )}
-                    
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>Criado: {formatDate(pedido.created_at)}</span>
-                      {pedido.total_fotos > 0 && (
-                        <span>• {pedido.total_fotos} foto(s)</span>
-                      )}
-                      {pedido.total_updates > 0 && (
-                        <span>• {pedido.total_updates} atualização(ões)</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Link to={`/pedidos/${pedido.id}`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="mr-2 h-4 w-4" />
-                        Ver Detalhes
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Contador */}
-      {filteredPedidos.length > 0 && (
-        <div className="text-center text-sm text-gray-600">
-          A mostrar {filteredPedidos.length} de {pedidos.length} pedido(s)
-        </div>
-      )}
+      {/* Modal de Detalhes */}
+      <ModalDetalhesPedidoDept
+        pedidoId={pedidoSelecionado}
+        isOpen={modalDetalhesOpen}
+        onClose={handleCloseDetalhes}
+        onUpdate={loadData}
+      />
     </div>
   );
 }
