@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { pedidosAPI, adminAPI } from '../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Package, Clock, TrendingUp, Plus, Search } from 'lucide-react';
 import ModalNovoPedido from '../components/ModalNovoPedido';
+import ModalDetalhesPedido from '../components/ModalDetalhesPedido';
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [pedidosFiltrados, setPedidosFiltrados] = useState([]);
@@ -19,7 +18,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [filtroStatus, setFiltroStatus] = useState(null);
   const [pesquisa, setPesquisa] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalNovoOpen, setModalNovoOpen] = useState(false);
+  const [modalDetalhesOpen, setModalDetalhesOpen] = useState(false);
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -131,6 +132,17 @@ export default function Dashboard() {
     return statusPiscantes.includes(pedido.status) && pedido.tem_atualizacoes_novas === true;
   };
 
+  const handlePedidoClick = (pedido) => {
+    setPedidoSelecionado(pedido.id);
+    setModalDetalhesOpen(true);
+  };
+
+  const handleCloseDetalhes = () => {
+    setModalDetalhesOpen(false);
+    setPedidoSelecionado(null);
+    loadData(); // Recarrega para atualizar status de visualização
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -156,7 +168,7 @@ export default function Dashboard() {
         
         {user?.role === 'loja' && (
           <Button 
-            onClick={() => setModalOpen(true)}
+            onClick={() => setModalNovoOpen(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -305,7 +317,7 @@ export default function Dashboard() {
                 return (
                   <Card
                     key={pedido.id}
-                    onClick={() => navigate(`/pedidos/${pedido.id}`)}
+                    onClick={() => handlePedidoClick(pedido)}
                     className={`bg-gray-700 border-gray-600 cursor-pointer transition-all hover:scale-105 hover:shadow-xl ${
                       shouldPulse ? 'animate-pulse ring-2 ring-yellow-400' : ''
                     }`}
@@ -356,9 +368,17 @@ export default function Dashboard() {
 
       {/* Modal Novo Pedido */}
       <ModalNovoPedido 
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={modalNovoOpen}
+        onClose={() => setModalNovoOpen(false)}
         onSuccess={loadData}
+      />
+
+      {/* Modal Detalhes do Pedido */}
+      <ModalDetalhesPedido
+        pedidoId={pedidoSelecionado}
+        isOpen={modalDetalhesOpen}
+        onClose={handleCloseDetalhes}
+        onUpdate={loadData}
       />
     </div>
   );
