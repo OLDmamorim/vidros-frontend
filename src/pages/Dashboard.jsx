@@ -131,10 +131,9 @@ export default function Dashboard() {
     });
   };
 
-  // Verifica se deve piscar: tem atualizações novas E está em status respondido/aguarda_resposta
+  // Verifica se deve piscar: tem atualizações novas
   const devePiscar = (pedido) => {
-    const statusPiscantes = ['respondido', 'aguarda_resposta'];
-    return statusPiscantes.includes(pedido.status) && pedido.tem_atualizacoes_novas === true;
+    return pedido.tem_atualizacoes_novas === true;
   };
 
   const handlePedidoClick = (pedido) => {
