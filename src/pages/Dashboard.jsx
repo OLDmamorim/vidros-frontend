@@ -28,9 +28,9 @@ export default function Dashboard() {
   useEffect(() => {
     loadData();
     
-    // Auto-refresh a cada 5 segundos
+    // Auto-refresh a cada 5 segundos (silencioso, sem mostrar loading)
     const interval = setInterval(() => {
-      loadData();
+      loadData(true);
     }, 5000);
     
     return () => clearInterval(interval);
@@ -40,9 +40,9 @@ export default function Dashboard() {
     aplicarFiltros();
   }, [filtroStatus, pesquisa, pedidos]);
 
-  const loadData = async () => {
+  const loadData = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       
       const pedidosData = await pedidosAPI.getPedidos();
       setPedidos(pedidosData);
