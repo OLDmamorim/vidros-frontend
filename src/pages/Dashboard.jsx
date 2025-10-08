@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { pedidosAPI, adminAPI } from '../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import ModalDetalhesPedido from '../components/ModalDetalhesPedido';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [pedidosFiltrados, setPedidosFiltrados] = useState([]);
@@ -259,7 +261,10 @@ export default function Dashboard() {
                 Utilize o menu de navegação para aceder às páginas de gestão:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
+                <Card 
+                  className="border-2 border-blue-200 hover:border-blue-400 transition-colors cursor-pointer hover:shadow-lg"
+                  onClick={() => navigate('/admin/lojas')}
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center text-xl">
                       <Package className="mr-2 h-6 w-6 text-blue-600" />
@@ -272,7 +277,10 @@ export default function Dashboard() {
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
+                <Card 
+                  className="border-2 border-green-200 hover:border-green-400 transition-colors cursor-pointer hover:shadow-lg"
+                  onClick={() => navigate('/admin/users')}
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center text-xl">
                       <TrendingUp className="mr-2 h-6 w-6 text-green-600" />
