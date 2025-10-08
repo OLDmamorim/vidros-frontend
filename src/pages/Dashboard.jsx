@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Package, Clock, TrendingUp, Plus, Search } from 'lucide-react';
 import ModalNovoPedido from '../components/ModalNovoPedido';
 import ModalDetalhesPedido from '../components/ModalDetalhesPedido';
+import ModalDetalhesPedidoDept from '../components/ModalDetalhesPedidoDept';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -39,7 +40,8 @@ export default function Dashboard() {
       const pedidosData = await pedidosAPI.getPedidos();
       setPedidos(pedidosData);
 
-      if (user?.role === 'loja') {
+      // Calcular estatísticas para loja e departamento
+      if (user?.role === 'loja' || user?.role === 'departamento') {
         const statusCount = {
           pendente: 0,
           em_progresso: 0,
@@ -90,7 +92,8 @@ export default function Dashboard() {
         p.matricula?.toLowerCase().includes(termo) ||
         p.marca_carro?.toLowerCase().includes(termo) ||
         p.modelo_carro?.toLowerCase().includes(termo) ||
-        p.tipo_vidro?.toLowerCase().includes(termo)
+        p.tipo_vidro?.toLowerCase().includes(termo) ||
+        p.loja_name?.toLowerCase().includes(termo)
       );
     }
 
@@ -154,14 +157,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`space-y-6 ${user?.role === 'loja' ? 'min-h-screen bg-gray-800 -m-6 p-6' : ''}`}>
+    <div className={`space-y-6 ${(user?.role === 'loja' || user?.role === 'departamento') ? 'min-h-screen bg-gray-800 -m-6 p-6' : ''}`}>
       {/* Header com Botão Criar Pedido */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`text-3xl font-bold ${user?.role === 'loja' ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-3xl font-bold ${(user?.role === 'loja' || user?.role === 'departamento') ? 'text-white' : 'text-gray-900'}`}>
             Bem-vindo, {user?.name}
           </h1>
-          <p className={`mt-2 ${user?.role === 'loja' ? 'text-gray-300' : 'text-gray-600'}`}>
+          <p className={`mt-2 ${(user?.role === 'loja' || user?.role === 'departamento') ? 'text-gray-300' : 'text-gray-600'}`}>
             {user?.role === 'admin' && 'Painel de Administração'}
             {user?.role === 'loja' && `Loja: ${user?.loja_name}`}
             {user?.role === 'departamento' && 'Departamento de Vidros Especiais'}
@@ -179,7 +182,7 @@ export default function Dashboard() {
         )}
       </div>
 
-          {/* Dashboard da Loja e Departamento */}
+      {/* Dashboard da Loja e Departamento */}
       {(user?.role === 'loja' || user?.role === 'departamento') && pedidosStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {Object.entries(pedidosStats).map(([status, count]) => {
@@ -220,14 +223,16 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Campo de Pesquisa (apenas para loja) */}
-      {user?.role === 'loja' && (
+      {/* Campo de Pesquisa (para loja e departamento) */}
+      {(user?.role === 'loja' || user?.role === 'departamento') && (
         <div className="flex items-center space-x-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               type="text"
-              placeholder="Pesquisar por matrícula, marca, modelo ou tipo de vidro..."
+              placeholder={user?.role === 'departamento' 
+                ? "Pesquisar por matrícula, marca, modelo, tipo de vidro ou loja..." 
+                : "Pesquisar por matrícula, marca, modelo ou tipo de vidro..."}
               value={pesquisa}
               onChange={(e) => setPesquisa(e.target.value.toUpperCase())}
               className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 uppercase"
@@ -300,7 +305,7 @@ export default function Dashboard() {
       )}
 
       {/* Grid de Pedidos em Cartões Quadrados */}
-      {user?.role === 'loja' && (
+      {(user?.role === 'loja' || user?.role === 'departamento') && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">
@@ -352,6 +357,11 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-300 line-clamp-2">
                         {pedido.tipo_vidro}
                       </p>
+                      {user?.role === 'departamento' && (
+                        <p className="text-xs text-blue-300 font-semibold pt-1 border-t border-gray-600">
+                          📍 {pedido.loja_name}
+                        </p>
+                      )}
                       <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-600">
                         <span>{formatDate(pedido.created_at)}</span>
                         <div className="flex space-x-2">
@@ -381,13 +391,25 @@ export default function Dashboard() {
         onSuccess={loadData}
       />
 
-      {/* Modal Detalhes do Pedido */}
-      <ModalDetalhesPedido
-        pedidoId={pedidoSelecionado}
-        isOpen={modalDetalhesOpen}
-        onClose={handleCloseDetalhes}
-        onUpdate={loadData}
-      />
+      {/* Modal Detalhes do Pedido - Loja */}
+      {user?.role === 'loja' && (
+        <ModalDetalhesPedido
+          pedidoId={pedidoSelecionado}
+          isOpen={modalDetalhesOpen}
+          onClose={handleCloseDetalhes}
+          onUpdate={loadData}
+        />
+      )}
+
+      {/* Modal Detalhes do Pedido - Departamento */}
+      {user?.role === 'departamento' && (
+        <ModalDetalhesPedidoDept
+          pedidoId={pedidoSelecionado}
+          isOpen={modalDetalhesOpen}
+          onClose={handleCloseDetalhes}
+          onUpdate={loadData}
+        />
+      )}
     </div>
   );
 }
