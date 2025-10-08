@@ -15,6 +15,7 @@ export default function NovoPedido() {
   const [error, setError] = useState('');
   const [fotos, setFotos] = useState([]);
   const [formData, setFormData] = useState({
+    matricula: '',
     marca_carro: '',
     modelo_carro: '',
     ano_carro: '',
@@ -22,11 +23,34 @@ export default function NovoPedido() {
     descricao: ''
   });
 
+  const formatMatricula = (value) => {
+    // Remove tudo exceto letras e números
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    // Aplica formato XX-XX-XX
+    if (cleaned.length <= 2) return cleaned;
+    if (cleaned.length <= 4) return `${cleaned.slice(0, 2)}-${cleaned.slice(2)}`;
+    return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 4)}-${cleaned.slice(4, 6)}`;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    let processedValue = value;
+    
+    // Formatar matrícula
+    if (name === 'matricula') {
+      processedValue = formatMatricula(value);
+    }
+    
+    // Converter para maiúsculas: marca, modelo, tipo_vidro
+    if (['marca_carro', 'modelo_carro', 'tipo_vidro'].includes(name)) {
+      processedValue = value.toUpperCase();
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
   };
 
@@ -109,17 +133,34 @@ export default function NovoPedido() {
               </Alert>
             )}
 
+            {/* Matrícula - Primeiro campo */}
+            <div className="space-y-2">
+              <Label htmlFor="matricula">Matrícula *</Label>
+              <Input
+                id="matricula"
+                name="matricula"
+                placeholder="XX-XX-XX"
+                value={formData.matricula}
+                onChange={handleInputChange}
+                required
+                disabled={loading}
+                maxLength={8}
+                className="font-mono text-lg"
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="marca_carro">Marca *</Label>
                 <Input
                   id="marca_carro"
                   name="marca_carro"
-                  placeholder="Ex: Mercedes"
+                  placeholder="Ex: MERCEDES"
                   value={formData.marca_carro}
                   onChange={handleInputChange}
                   required
                   disabled={loading}
+                  className="uppercase"
                 />
               </div>
 
@@ -128,11 +169,12 @@ export default function NovoPedido() {
                 <Input
                   id="modelo_carro"
                   name="modelo_carro"
-                  placeholder="Ex: Classe A"
+                  placeholder="Ex: CLASSE A"
                   value={formData.modelo_carro}
                   onChange={handleInputChange}
                   required
                   disabled={loading}
+                  className="uppercase"
                 />
               </div>
             </div>
@@ -158,11 +200,12 @@ export default function NovoPedido() {
                 <Input
                   id="tipo_vidro"
                   name="tipo_vidro"
-                  placeholder="Ex: Vidro porta frente esquerda"
+                  placeholder="Ex: VIDRO PORTA FRENTE ESQUERDA"
                   value={formData.tipo_vidro}
                   onChange={handleInputChange}
                   required
                   disabled={loading}
+                  className="uppercase"
                 />
               </div>
             </div>
