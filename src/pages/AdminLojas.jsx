@@ -209,10 +209,10 @@ export default function AdminLojas() {
             Administração de lojas do sistema
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Upload className="mr-2 h-4 w-4" />
                 Importar Excel
               </Button>
@@ -271,7 +271,7 @@ export default function AdminLojas() {
           
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => handleOpenDialog()}>
+              <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Nova Loja
               </Button>
