@@ -19,6 +19,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
   // Campos editáveis
   const [status, setStatus] = useState('');
   const [valor, setValor] = useState('');
+  const [disponibilidade, setDisponibilidade] = useState('');
   const [custo, setCusto] = useState('');
   const [fornecedor, setFornecedor] = useState('');
   
@@ -40,6 +41,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
       setPedido(data);
       setStatus(data.status);
       setValor(data.valor || '');
+      setDisponibilidade(data.disponibilidade || '');
       setCusto(data.custo || '');
       setFornecedor(data.fornecedor || '');
     } catch (err) {
@@ -57,6 +59,7 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
       await pedidosAPI.updatePedido(pedidoId, {
         status,
         valor: valor ? parseFloat(valor) : null,
+        disponibilidade: disponibilidade || null,
         custo: custo ? parseFloat(custo) : null,
         fornecedor: fornecedor || null
       });
@@ -301,6 +304,19 @@ export default function ModalDetalhesPedidoDept({ pedidoId, isOpen, onClose, onU
                           className="pl-10 bg-gray-800 border-gray-600 text-white"
                         />
                       </div>
+                    </div>
+
+                    {/* Disponibilidade (Visível para Loja) */}
+                    <div>
+                      <label className="text-xs text-gray-400 uppercase tracking-wide block mb-2">
+                        Disponibilidade <span className="text-green-400">(Visível para Loja)</span>
+                      </label>
+                      <Textarea
+                        value={disponibilidade}
+                        onChange={(e) => setDisponibilidade(e.target.value)}
+                        placeholder="Ex: Disponível em 2-3 dias úteis"
+                        className="bg-gray-800 border-gray-600 text-white min-h-[80px]"
+                      />
                     </div>
 
                     {/* Custo (Apenas Departamento) */}

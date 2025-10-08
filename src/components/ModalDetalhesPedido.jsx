@@ -252,6 +252,16 @@ export default function ModalDetalhesPedido({ pedidoId, isOpen, onClose, onUpdat
                         </div>
                       </div>
                     </div>
+
+                    {/* Disponibilidade */}
+                    {pedido.disponibilidade && (
+                      <div className="pt-3">
+                        <span className="text-xs text-gray-400 uppercase tracking-wide">Disponibilidade</span>
+                        <div className="mt-2 bg-gray-800 rounded-lg p-4 border border-gray-600">
+                          <p className="text-white whitespace-pre-wrap">{pedido.disponibilidade}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
