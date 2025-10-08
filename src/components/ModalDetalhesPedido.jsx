@@ -36,8 +36,6 @@ export default function ModalDetalhesPedido({ pedidoId, isOpen, onClose, onUpdat
     const configs = {
       pendente: { label: 'Pendente', color: 'bg-yellow-500' },
       em_progresso: { label: 'A Tratar', color: 'bg-blue-500' },
-      respondido: { label: 'Respondido', color: 'bg-yellow-400' },
-      aguarda_resposta: { label: 'Aguarda Resposta', color: 'bg-yellow-400' },
       encontrado: { label: 'Encomendado', color: 'bg-green-500' },
       concluido: { label: 'Concluído', color: 'bg-green-600' },
       cancelado: { label: 'Cancelado', color: 'bg-red-500' }

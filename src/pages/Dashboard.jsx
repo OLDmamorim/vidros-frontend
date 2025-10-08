@@ -52,8 +52,6 @@ export default function Dashboard() {
         const statusCount = {
           pendente: 0,
           em_progresso: 0,
-          respondido: 0,
-          aguarda_resposta: 0,
           encontrado: 0,
           concluido: 0,
           cancelado: 0
@@ -119,8 +117,6 @@ export default function Dashboard() {
     const configs = {
       pendente: { label: 'Pendente', color: 'bg-yellow-500', textColor: 'text-yellow-400' },
       em_progresso: { label: 'A Tratar', color: 'bg-blue-500', textColor: 'text-blue-400' },
-      respondido: { label: 'Respondido', color: 'bg-yellow-400', textColor: 'text-yellow-300' },
-      aguarda_resposta: { label: 'Aguarda Resposta', color: 'bg-yellow-400', textColor: 'text-yellow-300' },
       encontrado: { label: 'Encomendado', color: 'bg-green-500', textColor: 'text-green-400' },
       concluido: { label: 'Concluído', color: 'bg-green-600', textColor: 'text-green-500' },
       cancelado: { label: 'Cancelado', color: 'bg-red-500', textColor: 'text-red-400' }
