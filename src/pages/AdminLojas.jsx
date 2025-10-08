@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Loader2, Store } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Store, Upload } from 'lucide-react';
 
 export default function AdminLojas() {
   const [lojas, setLojas] = useState([]);
@@ -21,11 +21,12 @@ export default function AdminLojas() {
   const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    email: ''
+    name: ''
   });
+  
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     loadLojas();
@@ -47,18 +48,12 @@ export default function AdminLojas() {
     if (loja) {
       setEditingLoja(loja);
       setFormData({
-        name: loja.name,
-        address: loja.address || '',
-        phone: loja.phone || '',
-        email: loja.email || ''
+        name: loja.name
       });
     } else {
       setEditingLoja(null);
       setFormData({
-        name: '',
-        address: '',
-        phone: '',
-        email: ''
+        name: ''
       });
     }
     setError('');
@@ -103,6 +98,91 @@ export default function AdminLojas() {
     }
   };
 
+  const handleImportExcel = async () => {
+    if (!importFile) {
+      setError('Por favor selecione um ficheiro Excel');
+      return;
+    }
+
+    setImporting(true);
+    setError('');
+
+    try {
+      // Carregar biblioteca XLSX via CDN se não estiver disponível
+      if (!window.XLSX) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve) => { script.onload = resolve; });
+      }
+
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = window.XLSX.read(data, { type: 'array' });
+          
+          // Ler primeira sheet
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+          
+          // Extrair nomes da coluna A (índice 0), ignorando header
+          const nomesLojas = rows
+            .slice(1) // Pular primeira linha (header)
+            .map(row => row[0]) // Pegar coluna A
+            .filter(nome => nome && nome.toString().trim()) // Remover vazios
+            .map(nome => nome.toString().trim());
+          
+          if (nomesLojas.length === 0) {
+            setError('Nenhuma loja encontrada no ficheiro Excel');
+            setImporting(false);
+            return;
+          }
+          
+          // Criar lojas em batch
+          let sucessos = 0;
+          let erros = 0;
+          
+          for (const nome of nomesLojas) {
+            try {
+              await adminAPI.createLoja({ name: nome });
+              sucessos++;
+            } catch (err) {
+              console.error(`Erro ao criar loja "${nome}":`, err);
+              erros++;
+            }
+          }
+          
+          // Recarregar lista
+          await loadLojas();
+          
+          // Fechar dialog e mostrar resultado
+          setImportDialogOpen(false);
+          setImportFile(null);
+          
+          if (erros === 0) {
+            alert(`✅ ${sucessos} loja(s) importada(s) com sucesso!`);
+          } else {
+            alert(`⚠️ ${sucessos} loja(s) importada(s), ${erros} erro(s)`);
+          }
+          
+        } catch (err) {
+          console.error('Erro ao processar Excel:', err);
+          setError('Erro ao processar ficheiro Excel. Verifique o formato.');
+        } finally {
+          setImporting(false);
+        }
+      };
+      
+      reader.readAsArrayBuffer(importFile);
+      
+    } catch (err) {
+      setError(err.message || 'Erro ao importar ficheiro');
+      setImporting(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('pt-PT', {
       day: '2-digit',
@@ -129,13 +209,73 @@ export default function AdminLojas() {
             Administração de lojas do sistema
           </p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Loja
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Upload className="mr-2 h-4 w-4" />
+                Importar Excel
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Importar Lojas via Excel</DialogTitle>
+                <DialogDescription>
+                  Selecione um ficheiro Excel (.xlsx ou .xls) com os nomes das lojas na Coluna A
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="excel-file">Ficheiro Excel</Label>
+                  <Input
+                    id="excel-file"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => setImportFile(e.target.files[0])}
+                    disabled={importing}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Formato: Coluna A = Nome da Loja (primeira linha é ignorada como header)
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setImportDialogOpen(false);
+                    setImportFile(null);
+                    setError('');
+                  }}
+                  disabled={importing}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleImportExcel}
+                  disabled={importing || !importFile}
+                >
+                  {importing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {importing ? 'A importar...' : 'Importar'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => handleOpenDialog()}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Loja
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
@@ -163,42 +303,6 @@ export default function AdminLojas() {
                     disabled={submitting}
                     placeholder="Ex: Loja Centro"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address">Morada</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                    disabled={submitting}
-                    placeholder="Ex: Rua Principal, 123, Lisboa"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Telefone</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      disabled={submitting}
-                      placeholder="Ex: 210000000"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      disabled={submitting}
-                      placeholder="Ex: loja@exemplo.pt"
-                    />
-                  </div>
                 </div>
               </div>
               <DialogFooter>
