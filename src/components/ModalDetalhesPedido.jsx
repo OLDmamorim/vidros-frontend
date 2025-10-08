@@ -256,41 +256,6 @@ export default function ModalDetalhesPedido({ pedidoId, isOpen, onClose, onUpdat
                   </div>
                 </div>
 
-                {/* Responder */}
-                <div className="bg-gray-700 rounded-lg p-5">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center border-b border-gray-600 pb-2">
-                    <MessageSquare className="mr-2 h-5 w-5 text-blue-400" />
-                    Responder ao Departamento
-                  </h3>
-                  
-                  <div className="space-y-4">
-                    <textarea
-                      value={novaMensagem}
-                      onChange={(e) => setNovaMensagem(e.target.value)}
-                      placeholder="Escreva a sua resposta ou questão..."
-                      className="w-full bg-gray-800 border-gray-600 text-white rounded-lg p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    
-                    <Button
-                      onClick={handleAddMensagem}
-                      disabled={saving || !novaMensagem.trim()}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          A enviar...
-                        </>
-                      ) : (
-                        <>
-                          <MessageSquare className="mr-2 h-4 w-4" />
-                          Enviar Mensagem
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
                 {/* Histórico de Comunicação */}
                 <div className="bg-gray-700 rounded-lg p-5">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center border-b border-gray-600 pb-2">
@@ -333,6 +298,41 @@ export default function ModalDetalhesPedido({ pedidoId, isOpen, onClose, onUpdat
                       <p className="text-xs mt-1">O departamento irá responder em breve</p>
                     </div>
                   )}
+                </div>
+
+                {/* Responder */}
+                <div className="bg-gray-700 rounded-lg p-5">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center border-b border-gray-600 pb-2">
+                    <MessageSquare className="mr-2 h-5 w-5 text-blue-400" />
+                    Responder ao Departamento
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <textarea
+                      value={novaMensagem}
+                      onChange={(e) => setNovaMensagem(e.target.value)}
+                      placeholder="Escreva a sua resposta ou questão..."
+                      className="w-full bg-gray-800 border-gray-600 text-white rounded-lg p-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    
+                    <Button
+                      onClick={handleAddMensagem}
+                      disabled={saving || !novaMensagem.trim()}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          A enviar...
+                        </>
+                      ) : (
+                        <>
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          Enviar Mensagem
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
