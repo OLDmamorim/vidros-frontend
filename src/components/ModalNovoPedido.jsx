@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Camera, Loader2 } from 'lucide-react';
 
 export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
@@ -39,6 +40,50 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
     'Triângulo Prt Esq. Frente',
     'Custódia Frente Esquerda',
     'Tecto'
+  ];
+
+  const marcasDisponiveis = [
+    'Alfa Romeo',
+    'Audi',
+    'BYD',
+    'BMW',
+    'Citroën',
+    'Dacia',
+    'DAF',
+    'Fiat',
+    'Ford',
+    'Honda',
+    'Hyundai',
+    'Jaguar',
+    'Jeep',
+    'Kia',
+    'Lancia',
+    'Land Rover',
+    'MAN',
+    'Maxus',
+    'Mazda',
+    'Mercedes-Benz',
+    'Mini',
+    'Mitsubishi',
+    'Nissan',
+    'Opel',
+    'Peugeot',
+    'Porsche',
+    'Range Rover',
+    'Renault',
+    'Rover',
+    'Saab',
+    'Scania',
+    'Seat',
+    'Škoda',
+    'Smart',
+    'Subaru',
+    'Suzuki',
+    'Tesla',
+    'Toyota',
+    'Volkswagen',
+    'Volvo',
+    'Outra'
   ];
 
   const formatMatricula = (value) => {
@@ -185,16 +230,22 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="marca_carro" className="text-gray-300">Marca *</Label>
-              <Input
-                id="marca_carro"
-                name="marca_carro"
-                placeholder="Ex: MERCEDES"
-                value={formData.marca_carro}
-                onChange={handleInputChange}
-                required
+              <Select 
+                value={formData.marca_carro} 
+                onValueChange={(value) => setFormData({ ...formData, marca_carro: value })}
                 disabled={loading}
-                className="uppercase bg-gray-700 border-gray-600 text-white"
-              />
+              >
+                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                  <SelectValue placeholder="Selecione a marca" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600 max-h-[300px]">
+                  {marcasDisponiveis.map((marca) => (
+                    <SelectItem key={marca} value={marca} className="text-white hover:bg-gray-700">
+                      {marca}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
