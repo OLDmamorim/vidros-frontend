@@ -233,7 +233,7 @@ export default function ModalNovoPedido({ isOpen, onClose, onSuccess }) {
             <Label className="text-gray-300">Referência de Identificação de Vidros</Label>
             <div className="bg-gray-700 border border-gray-600 rounded-md p-3">
               <img 
-                src="/glass-reference.jpg" 
+                src="/glass-reference-pt.jpg" 
                 alt="Referência de tipos de vidros de automóvel" 
                 className="w-full h-auto rounded"
               />
