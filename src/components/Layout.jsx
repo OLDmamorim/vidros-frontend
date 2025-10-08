@@ -3,14 +3,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Package, LogOut, User, Menu, X, Home, Users, Store, FileText } from 'lucide-react';
-import { useState } from 'react';
+import { Package, LogOut, Home, Users, Store, FileText } from 'lucide-react';
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -27,14 +25,13 @@ export default function Layout() {
 
   const isActive = (path) => location.pathname === path;
 
-  const navItems = [
-    { path: '/', label: 'Início', icon: Home, roles: ['admin', 'loja', 'departamento'] },
-    { path: '/pedidos', label: 'Pedidos', icon: FileText, roles: ['loja', 'departamento'] },
+  // Apenas admin e departamento têm navegação
+  const navItems = user?.role !== 'loja' ? [
+    { path: '/', label: 'Início', icon: Home, roles: ['admin', 'departamento'] },
+    { path: '/pedidos', label: 'Pedidos', icon: FileText, roles: ['departamento'] },
     { path: '/admin/lojas', label: 'Lojas', icon: Store, roles: ['admin'] },
     { path: '/admin/users', label: 'Utilizadores', icon: Users, roles: ['admin'] },
-  ];
-
-  const filteredNavItems = navItems.filter(item => item.roles.includes(user?.role));
+  ].filter(item => item.roles.includes(user?.role)) : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,26 +49,28 @@ export default function Layout() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              {filteredNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                      isActive(item.path)
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+            {/* Desktop Navigation - Apenas para admin e departamento */}
+            {navItems.length > 0 && (
+              <nav className="hidden md:flex items-center space-x-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                        isActive(item.path)
+                          ? 'bg-blue-50 text-blue-700 font-medium'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
@@ -100,45 +99,9 @@ export default function Layout() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
             </div>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
-            <nav className="px-4 py-3 space-y-1">
-              {filteredNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive(item.path)
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-        )}
       </header>
 
       {/* Main Content */}
