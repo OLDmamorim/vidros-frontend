@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Package, LogOut, Home, Users, Store, FileText } from 'lucide-react';
-import Footer from './Footer';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -110,9 +109,6 @@ export default function Layout() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

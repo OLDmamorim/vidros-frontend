@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
+import Footer from './components/Footer';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Pedidos from './pages/Pedidos';
@@ -56,6 +57,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Footer />
         <Routes>
           {/* Rota pública */}
           <Route
