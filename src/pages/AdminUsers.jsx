@@ -494,6 +494,7 @@ export default function AdminUsers() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Tabela de Utilizadores */}
