@@ -8,18 +8,18 @@ export default function Footer() {
   const logoSrc = isLoginPage ? '/turned_real_white.png' : '/turned_real_black.png';
   
   return (
-    <footer className="fixed bottom-4 right-4 z-10">
+    <footer className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 pointer-events-none">
       <a 
         href="https://nexai.pt" 
         target="_blank" 
         rel="noopener noreferrer"
-        className="block opacity-40 hover:opacity-70 transition-opacity duration-300"
+        className="block opacity-30 hover:opacity-60 transition-opacity duration-300 pointer-events-auto"
         title="Developed by NEXAI"
       >
         <img 
           src={logoSrc}
           alt="turned_real by NEXAI" 
-          className="h-8 w-auto"
+          className="h-5 sm:h-7 w-auto"
         />
       </a>
     </footer>
