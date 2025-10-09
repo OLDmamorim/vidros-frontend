@@ -192,13 +192,14 @@ export default function AdminUsers() {
           // Processar linhas (pular header)
           const utilizadores = rows
             .slice(1) // Pular primeira linha (header)
-            .filter(row => row[0] && row[1] && row[2] && row[3]) // Tem nome, email, password, tipo
+            .filter(row => row[0] && row[1] && row[2] && row[3]) // Tem nome, username, password, tipo
             .map(row => ({
               name: row[0]?.toString().trim(),
-              email: row[1]?.toString().trim(),
+              username: row[1]?.toString().trim(),
               password: row[2]?.toString().trim(),
               role: row[3]?.toString().trim().toLowerCase(),
-              loja_name: row[4]?.toString().trim() || null
+              loja_name: row[4]?.toString().trim() || null,
+              email: null  // Email opcional, não vem do Excel
             }));
 
           console.log('Utilizadores processados:', utilizadores);
@@ -216,33 +217,52 @@ export default function AdminUsers() {
 
           for (const user of utilizadores) {
             try {
-              // Encontrar loja pelo nome (se especificada e role for loja)
+              // Encontrar ou criar loja pelo nome (se especificada e role for loja)
               let loja_id = null;
               if (user.role === 'loja' && user.loja_name) {
-                const loja = lojas.find(l => 
+                let loja = lojas.find(l => 
                   l.name.toLowerCase() === user.loja_name.toLowerCase()
                 );
+                
+                if (!loja) {
+                  // Loja não existe, criar automaticamente
+                  console.log(`🏪 Criando loja "${user.loja_name}" automaticamente...`);
+                  try {
+                    loja = await adminAPI.createLoja({
+                      name: user.loja_name,
+                      address: '',
+                      phone: '',
+                      email: ''
+                    });
+                    // Adicionar à lista local de lojas
+                    lojas.push(loja);
+                    console.log(`✓ Loja "${user.loja_name}" criada com sucesso`);
+                  } catch (lojaErr) {
+                    console.error(`✗ Erro ao criar loja "${user.loja_name}":`, lojaErr);
+                    // Continuar sem loja
+                  }
+                }
+                
                 if (loja) {
                   loja_id = loja.id;
-                } else {
-                  console.warn(`Loja "${user.loja_name}" não encontrada para utilizador ${user.email}`);
                 }
               }
 
               // Criar utilizador
               await adminAPI.createUser({
                 name: user.name,
-                email: user.email,
+                username: user.username,
+                email: user.email || null,
                 password: user.password,
                 role: user.role,
                 loja_id: loja_id
               });
 
               sucessos++;
-              console.log(`✓ Utilizador ${user.email} criado com sucesso`);
+              console.log(`✓ Utilizador ${user.username} criado com sucesso`);
             } catch (err) {
-              console.error(`✗ Erro ao criar utilizador ${user.email}:`, err);
-              errosDetalhados.push(`${user.email}: ${err.message}`);
+              console.error(`✗ Erro ao criar utilizador ${user.username}:`, err);
+              errosDetalhados.push(`${user.username}: ${err.message}`);
               erros++;
             }
           }
@@ -341,11 +361,12 @@ export default function AdminUsers() {
                   <div className="text-xs text-gray-500 space-y-1 mt-2">
                     <p><strong>Formato esperado:</strong></p>
                     <p>• Coluna A: Nome</p>
-                    <p>• Coluna B: Email</p>
+                    <p>• Coluna B: Username</p>
                     <p>• Coluna C: Password</p>
                     <p>• Coluna D: Tipo (admin, loja ou departamento - case insensitive)</p>
-                    <p>• Coluna E: Loja (nome da loja, se aplicável)</p>
+                    <p>• Coluna E: Loja (nome da loja - será criada automaticamente se não existir)</p>
                     <p className="mt-2 italic">Primeira linha é ignorada como header</p>
+                    <p className="mt-2 text-green-600 font-medium">✨ Lojas são criadas automaticamente!</p>
                   </div>
                 </div>
               </div>
