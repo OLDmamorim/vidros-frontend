@@ -27,7 +27,7 @@ export default function AdminUsers() {
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    username: '',
     password: '',
     role: 'loja',
     loja_id: ''
@@ -58,7 +58,7 @@ export default function AdminUsers() {
       setEditingUser(user);
       setFormData({
         name: user.name,
-        email: user.email,
+        username: user.username,
         password: '',
         role: user.role,
         loja_id: user.loja_id || ''
@@ -67,7 +67,7 @@ export default function AdminUsers() {
       setEditingUser(null);
       setFormData({
         name: '',
-        email: '',
+        username: '',
         password: '',
         role: 'loja',
         loja_id: ''
@@ -226,15 +226,15 @@ export default function AdminUsers() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="username">Username *</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    id="username"
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                     required
                     disabled={submitting}
-                    placeholder="Ex: joao@exemplo.pt"
+                    placeholder="Ex: joao.silva"
                   />
                 </div>
 
@@ -346,7 +346,7 @@ export default function AdminUsers() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead>Username</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead className="hidden md:table-cell">Loja</TableHead>
                     <TableHead>Estado</TableHead>
@@ -357,7 +357,7 @@ export default function AdminUsers() {
                   {users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.username}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         {user.loja_name || '-'}
