@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Loader2, Users, Key } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Users, Key, Upload } from 'lucide-react';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -19,11 +19,14 @@ export default function AdminUsers() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
   const [resettingUser, setResettingUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importing, setImporting] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -157,6 +160,112 @@ export default function AdminUsers() {
     }
   };
 
+  const handleImportExcel = async () => {
+    if (!importFile) {
+      setError('Por favor selecione um ficheiro');
+      return;
+    }
+
+    try {
+      setImporting(true);
+      setError('');
+
+      // Carregar biblioteca XLSX se ainda não estiver carregada
+      if (!window.XLSX) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve) => { script.onload = resolve; });
+      }
+
+      // Ler ficheiro Excel
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = window.XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+          // Processar linhas (pular header)
+          const utilizadores = rows
+            .slice(1) // Pular primeira linha (header)
+            .filter(row => row[0] && row[1] && row[2] && row[3]) // Tem nome, username, password, tipo
+            .map(row => ({
+              name: row[0]?.toString().trim(),
+              username: row[1]?.toString().trim(),
+              password: row[2]?.toString().trim(),
+              role: row[3]?.toString().trim().toLowerCase(),
+              loja_name: row[4]?.toString().trim() || null
+            }));
+
+          if (utilizadores.length === 0) {
+            setError('Nenhum utilizador válido encontrado no ficheiro');
+            setImporting(false);
+            return;
+          }
+
+          // Criar utilizadores
+          let sucessos = 0;
+          let erros = 0;
+
+          for (const user of utilizadores) {
+            try {
+              // Encontrar loja pelo nome (se especificada)
+              let loja_id = null;
+              if (user.loja_name) {
+                const loja = lojas.find(l => 
+                  l.name.toLowerCase() === user.loja_name.toLowerCase()
+                );
+                if (loja) {
+                  loja_id = loja.id;
+                }
+              }
+
+              // Criar utilizador
+              await adminAPI.createUser({
+                name: user.name,
+                username: user.username,
+                password: user.password,
+                role: user.role,
+                loja_id: loja_id
+              });
+
+              sucessos++;
+            } catch (err) {
+              console.error(`Erro ao criar utilizador ${user.username}:`, err);
+              erros++;
+            }
+          }
+
+          // Recarregar lista
+          await loadData();
+
+          // Fechar modal e mostrar resultado
+          setImportDialogOpen(false);
+          setImportFile(null);
+
+          if (erros === 0) {
+            alert(`✅ ${sucessos} utilizador(es) importado(s) com sucesso!`);
+          } else {
+            alert(`⚠️ ${sucessos} utilizador(es) importado(s), ${erros} erro(s)`);
+          }
+        } catch (err) {
+          console.error('Erro ao processar Excel:', err);
+          setError('Erro ao processar ficheiro Excel: ' + err.message);
+        } finally {
+          setImporting(false);
+        }
+      };
+
+      reader.readAsArrayBuffer(importFile);
+    } catch (err) {
+      console.error('Erro ao importar:', err);
+      setError('Erro ao importar utilizadores: ' + err.message);
+      setImporting(false);
+    }
+  };
+
   const getRoleBadge = (role) => {
     const variants = {
       admin: { color: 'bg-purple-100 text-purple-800', label: 'Admin' },
@@ -189,13 +298,79 @@ export default function AdminUsers() {
             Administração de utilizadores do sistema
           </p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Utilizador
-            </Button>
-          </DialogTrigger>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-auto">
+                <Upload className="mr-2 h-4 w-4" />
+                Importar Excel
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Importar Utilizadores via Excel</DialogTitle>
+                <DialogDescription>
+                  Selecione um ficheiro Excel (.xlsx ou .xls) com os dados dos utilizadores
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="excel-file">Ficheiro Excel</Label>
+                  <Input
+                    id="excel-file"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => setImportFile(e.target.files[0])}
+                    disabled={importing}
+                  />
+                  <div className="text-xs text-gray-500 space-y-1 mt-2">
+                    <p><strong>Formato esperado:</strong></p>
+                    <p>• Coluna A: Nome</p>
+                    <p>• Coluna B: Username</p>
+                    <p>• Coluna C: Password</p>
+                    <p>• Coluna D: Tipo (admin, loja, departamento)</p>
+                    <p>• Coluna E: Loja (nome da loja, se aplicável)</p>
+                    <p className="mt-2 italic">Primeira linha é ignorada como header</p>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setImportDialogOpen(false);
+                    setImportFile(null);
+                    setError('');
+                  }}
+                  disabled={importing}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleImportExcel}
+                  disabled={importing || !importFile}
+                >
+                  {importing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {importing ? 'A importar...' : 'Importar'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => handleOpenDialog()} className="w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Utilizador
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
