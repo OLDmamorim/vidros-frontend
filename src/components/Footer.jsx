@@ -1,11 +1,11 @@
 export default function Footer() {
   return (
-    <footer className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+    <footer className="w-full py-6 flex justify-center items-center">
       <a 
         href="https://nexai.pt" 
         target="_blank" 
         rel="noopener noreferrer"
-        className="block pointer-events-auto group"
+        className="block group"
         title="Developed by NEXAI"
       >
         <img 
