@@ -30,7 +30,7 @@ export default function AdminUsers() {
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    username: '',
     password: '',
     role: 'loja',
     loja_id: ''
@@ -61,7 +61,7 @@ export default function AdminUsers() {
       setEditingUser(user);
       setFormData({
         name: user.name,
-        email: user.email,
+        username: user.username || '',
         password: '',
         role: user.role,
         loja_id: user.loja_id || ''
@@ -70,7 +70,7 @@ export default function AdminUsers() {
       setEditingUser(null);
       setFormData({
         name: '',
-        email: '',
+        username: '',
         password: '',
         role: 'loja',
         loja_id: ''
@@ -432,15 +432,15 @@ export default function AdminUsers() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="username">Username *</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    id="username"
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                     required
                     disabled={submitting}
-                    placeholder="Ex: joao.silva@empresa.pt"
+                    placeholder="Ex: joao.silva"
                   />
                 </div>
 
