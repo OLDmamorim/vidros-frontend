@@ -57,7 +57,6 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Footer />
         <Routes>
           {/* Rota pública */}
           <Route
@@ -128,6 +127,7 @@ function App() {
           {/* Rota 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Footer />
       </Router>
     </AuthProvider>
   );
