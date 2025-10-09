@@ -16,8 +16,10 @@ export default function AdminLojas() {
   const [error, setError] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [editingLoja, setEditingLoja] = useState(null);
   const [deletingLoja, setDeletingLoja] = useState(null);
+  const [resettingLoja, setResettingLoja] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -93,6 +95,25 @@ export default function AdminLojas() {
       await loadLojas();
     } catch (err) {
       setError(err.message || 'Erro ao eliminar loja');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!resettingLoja) return;
+
+    setError('');
+    setSubmitting(true);
+
+    try {
+      const response = await adminAPI.resetLojaPedidos(resettingLoja.id);
+      setResetDialogOpen(false);
+      setResettingLoja(null);
+      alert(`✓ ${response.pedidos_eliminados} pedido(s) eliminado(s) da loja ${response.loja_name}`);
+      await loadLojas();
+    } catch (err) {
+      setError(err.message || 'Erro ao fazer reset de pedidos');
     } finally {
       setSubmitting(false);
     }
@@ -391,8 +412,20 @@ export default function AdminLojas() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleOpenDialog(loja)}
+                            title="Editar loja"
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setResettingLoja(loja);
+                              setResetDialogOpen(true);
+                            }}
+                            title="Reset pedidos"
+                          >
+                            <Trash2 className="h-4 w-4 text-orange-600" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -401,6 +434,7 @@ export default function AdminLojas() {
                               setDeletingLoja(loja);
                               setDeleteDialogOpen(true);
                             }}
+                            title="Eliminar loja"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
@@ -414,6 +448,59 @@ export default function AdminLojas() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog de Confirmação de Reset */}
+      <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset de Pedidos</DialogTitle>
+            <DialogDescription>
+              Tem a certeza que deseja eliminar TODOS os pedidos da loja <strong>{resettingLoja?.name}</strong>?
+              <br /><br />
+              <span className="text-orange-600 font-semibold">⚠️ Esta ação vai eliminar permanentemente:</span>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Todos os pedidos da loja</li>
+                <li>Todas as fotos dos pedidos</li>
+                <li>Todos os updates dos pedidos</li>
+              </ul>
+              <br />
+              <span className="text-green-600">✓ A loja e os utilizadores serão mantidos</span>
+            </DialogDescription>
+          </DialogHeader>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setResetDialogOpen(false);
+                setResettingLoja(null);
+                setError('');
+              }}
+              disabled={submitting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="bg-orange-600 hover:bg-orange-700"
+              onClick={handleReset}
+              disabled={submitting}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  A eliminar pedidos...
+                </>
+              ) : (
+                'Confirmar Reset'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de Confirmação de Eliminação */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

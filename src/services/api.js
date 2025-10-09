@@ -55,6 +55,18 @@ export const adminAPI = {
     return response.json();
   },
 
+  resetLojaPedidos: async (id) => {
+    const response = await fetch(`${API_URL}/api/admin/lojas/${id}/reset-pedidos`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Erro ao fazer reset de pedidos');
+    }
+    return response.json();
+  },
+
   // Utilizadores
   getUsers: async () => {
     const response = await fetch(`${API_URL}/api/admin/users`, {
