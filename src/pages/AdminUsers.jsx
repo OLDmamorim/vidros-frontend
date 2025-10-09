@@ -553,7 +553,7 @@ export default function AdminUsers() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead>Username</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead className="hidden md:table-cell">Loja</TableHead>
                     <TableHead>Estado</TableHead>
@@ -564,7 +564,7 @@ export default function AdminUsers() {
                   {users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.username || user.email || '-'}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         {user.loja_name || '-'}
