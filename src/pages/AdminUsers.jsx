@@ -30,7 +30,7 @@ export default function AdminUsers() {
   
   const [formData, setFormData] = useState({
     name: '',
-    username: '',
+    email: '',
     password: '',
     role: 'loja',
     loja_id: ''
@@ -61,7 +61,7 @@ export default function AdminUsers() {
       setEditingUser(user);
       setFormData({
         name: user.name,
-        username: user.username,
+        email: user.email,
         password: '',
         role: user.role,
         loja_id: user.loja_id || ''
@@ -70,7 +70,7 @@ export default function AdminUsers() {
       setEditingUser(null);
       setFormData({
         name: '',
-        username: '',
+        email: '',
         password: '',
         role: 'loja',
         loja_id: ''
@@ -187,17 +187,21 @@ export default function AdminUsers() {
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
+          console.log('Linhas lidas do Excel:', rows);
+
           // Processar linhas (pular header)
           const utilizadores = rows
             .slice(1) // Pular primeira linha (header)
-            .filter(row => row[0] && row[1] && row[2] && row[3]) // Tem nome, username, password, tipo
+            .filter(row => row[0] && row[1] && row[2] && row[3]) // Tem nome, email, password, tipo
             .map(row => ({
               name: row[0]?.toString().trim(),
-              username: row[1]?.toString().trim(),
+              email: row[1]?.toString().trim(),
               password: row[2]?.toString().trim(),
               role: row[3]?.toString().trim().toLowerCase(),
               loja_name: row[4]?.toString().trim() || null
             }));
+
+          console.log('Utilizadores processados:', utilizadores);
 
           if (utilizadores.length === 0) {
             setError('Nenhum utilizador válido encontrado no ficheiro');
@@ -208,32 +212,37 @@ export default function AdminUsers() {
           // Criar utilizadores
           let sucessos = 0;
           let erros = 0;
+          const errosDetalhados = [];
 
           for (const user of utilizadores) {
             try {
-              // Encontrar loja pelo nome (se especificada)
+              // Encontrar loja pelo nome (se especificada e role for loja)
               let loja_id = null;
-              if (user.loja_name) {
+              if (user.role === 'loja' && user.loja_name) {
                 const loja = lojas.find(l => 
                   l.name.toLowerCase() === user.loja_name.toLowerCase()
                 );
                 if (loja) {
                   loja_id = loja.id;
+                } else {
+                  console.warn(`Loja "${user.loja_name}" não encontrada para utilizador ${user.email}`);
                 }
               }
 
               // Criar utilizador
               await adminAPI.createUser({
                 name: user.name,
-                username: user.username,
+                email: user.email,
                 password: user.password,
                 role: user.role,
                 loja_id: loja_id
               });
 
               sucessos++;
+              console.log(`✓ Utilizador ${user.email} criado com sucesso`);
             } catch (err) {
-              console.error(`Erro ao criar utilizador ${user.username}:`, err);
+              console.error(`✗ Erro ao criar utilizador ${user.email}:`, err);
+              errosDetalhados.push(`${user.email}: ${err.message}`);
               erros++;
             }
           }
@@ -248,7 +257,8 @@ export default function AdminUsers() {
           if (erros === 0) {
             alert(`✅ ${sucessos} utilizador(es) importado(s) com sucesso!`);
           } else {
-            alert(`⚠️ ${sucessos} utilizador(es) importado(s), ${erros} erro(s)`);
+            const mensagem = `⚠️ ${sucessos} utilizador(es) importado(s), ${erros} erro(s)\n\nErros:\n${errosDetalhados.join('\n')}`;
+            alert(mensagem);
           }
         } catch (err) {
           console.error('Erro ao processar Excel:', err);
@@ -331,9 +341,9 @@ export default function AdminUsers() {
                   <div className="text-xs text-gray-500 space-y-1 mt-2">
                     <p><strong>Formato esperado:</strong></p>
                     <p>• Coluna A: Nome</p>
-                    <p>• Coluna B: Username</p>
+                    <p>• Coluna B: Email</p>
                     <p>• Coluna C: Password</p>
-                    <p>• Coluna D: Tipo (admin, loja, departamento)</p>
+                    <p>• Coluna D: Tipo (admin, loja ou departamento - case insensitive)</p>
                     <p>• Coluna E: Loja (nome da loja, se aplicável)</p>
                     <p className="mt-2 italic">Primeira linha é ignorada como header</p>
                   </div>
@@ -401,15 +411,15 @@ export default function AdminUsers() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username *</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
-                    id="username"
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     required
                     disabled={submitting}
-                    placeholder="Ex: joao.silva"
+                    placeholder="Ex: joao.silva@empresa.pt"
                   />
                 </div>
 
@@ -522,7 +532,7 @@ export default function AdminUsers() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Username</TableHead>
+                    <TableHead>Email</TableHead>
                     <TableHead>Tipo</TableHead>
                     <TableHead className="hidden md:table-cell">Loja</TableHead>
                     <TableHead>Estado</TableHead>
@@ -533,7 +543,7 @@ export default function AdminUsers() {
                   {users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.username}</TableCell>
+                      <TableCell>{user.email}</TableCell>
                       <TableCell>{getRoleBadge(user.role)}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         {user.loja_name || '-'}
